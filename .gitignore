@@ -24,3 +24,6 @@ api-debug.log*
 
 # jetbrains setting folder
 .idea/
+
+# Vercel output and cache
+.vercel/
