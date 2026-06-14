@@ -31,6 +31,30 @@ const mapPosition = (posAbbr, posName) => {
   return 'MIDFIELDER';
 };
 
+const parseDisplayClockToMinutes = (displayClock) => {
+  if (!displayClock) return 0;
+  const clockStr = displayClock.toString().trim();
+  
+  if (/HT|Half/i.test(clockStr)) {
+    return 45;
+  }
+  
+  if (clockStr.includes('+')) {
+    const parts = clockStr.split('+');
+    const base = parseInt(parts[0]) || 0;
+    const extra = parseInt(parts[1]) || 0;
+    return base + extra;
+  }
+  
+  if (clockStr.includes(':')) {
+    const parts = clockStr.split(':');
+    return parseInt(parts[0]) || 0;
+  }
+  
+  const match = clockStr.match(/\d+/);
+  return match ? parseInt(match[0]) : 0;
+};
+
 export async function GET({ request }) {
   const matchId = request.headers.get('x-match-id');
   const now = Date.now();
@@ -149,13 +173,14 @@ export async function GET({ request }) {
       const mappedStatus = isLive ? 'LIVE' : isFinished ? 'FINISHED' : 'WAITING';
 
       const displayClock = competition.status?.displayClock || '';
-      const elapsed = parseInt(displayClock.replace(/[^0-9]/g, '')) || 0;
+      const elapsed = parseDisplayClockToMinutes(displayClock);
 
       const formattedMatch = {
         id: matchId,
         utcDate: competition.date,
         status: mappedStatus,
         elapsed: elapsed,
+        displayClock: displayClock,
         homeTeam: {
           id: homeCompetitor.id,
           name: homeCompetitor.team?.displayName || homeCompetitor.team?.name || 'میزبان',
@@ -249,13 +274,14 @@ export async function GET({ request }) {
         const isFinished = state === 'post';
         const mappedStatus = isLive ? 'LIVE' : isFinished ? 'FINISHED' : 'WAITING';
         const displayClock = event.status?.displayClock || '';
-        const elapsed = parseInt(displayClock.replace(/[^0-9]/g, '')) || 0;
+        const elapsed = parseDisplayClockToMinutes(displayClock);
 
         return {
           id: event.id,
           utcDate: event.date,
           status: mappedStatus,
           elapsed: elapsed,
+          displayClock: displayClock,
           homeTeam: {
             name: homeCompetitor?.team?.displayName || homeCompetitor?.team?.name || 'میزبان',
             crest: homeCompetitor?.team?.logo || homeCompetitor?.team?.logos?.[0]?.href || '',

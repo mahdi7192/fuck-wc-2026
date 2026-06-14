@@ -95,7 +95,9 @@ export default function MatchesList({ onSelectMatch }) {
             {isLive && (
               <span className="native-live-text">
                 <span className="pulse-dot"></span>
-                دقیقه {match.elapsed}'
+                {match.displayClock === "HT" || match.displayClock === "بین نیمه" || /HT/i.test(String(match.displayClock))
+                  ? "بین نیمه"
+                  : `دقیقه ${match.displayClock || match.elapsed}'`}
               </span>
             )}
             {isFinished && <span className="native-finished-text">پایان</span>}

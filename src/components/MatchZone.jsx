@@ -747,6 +747,29 @@ export default function MatchZone({ matchId, onBack }) {
     if (matchStatus === "LIVE") {
       interval = setInterval(() => {
         setMatchMinutes((prev) => {
+          if (typeof prev === "string") {
+            if (/HT|Half/i.test(prev) || prev === "بین نیمه") {
+              return prev;
+            }
+            if (prev.includes("+")) {
+              const parts = prev.split("+");
+              const base = parseInt(parts[0]) || 0;
+              const extra = parseInt(parts[1]) || 0;
+              if (base + extra >= 120) {
+                clearInterval(interval);
+                setMatchStatus("FINISHED");
+                return "120";
+              }
+              return `${base}+${extra + 1}`;
+            }
+            const numeric = parseInt(prev) || 0;
+            if (numeric >= 90) {
+              clearInterval(interval);
+              setMatchStatus("FINISHED");
+              return "90";
+            }
+            return String(numeric + 1);
+          }
           if (prev >= 90) {
             clearInterval(interval);
             setMatchStatus("FINISHED");
@@ -850,7 +873,7 @@ export default function MatchZone({ matchId, onBack }) {
       // Update match status and set match minutes/kickoff info
       if (isLive) {
         setMatchStatus("LIVE");
-        setMatchMinutes(elapsedMin);
+        setMatchMinutes(selectedMatch.displayClock || elapsedMin);
       } else if (isFinished) {
         setMatchStatus("FINISHED");
         setMatchMinutes(90);
@@ -1396,7 +1419,9 @@ export default function MatchZone({ matchId, onBack }) {
             className={`native-scoreboard-status ${matchStatus === "LIVE" ? "live" : ""}`}
           >
             {matchStatus === "LIVE"
-              ? `دقیقه ${matchMinutes}'`
+              ? (matchMinutes === "HT" || matchMinutes === "بین نیمه" || /HT/i.test(String(matchMinutes)))
+                ? "بین نیمه"
+                : `دقیقه ${matchMinutes}'`
               : matchStatus === "WAITING"
                 ? "شروع نشده"
                 : "پایان مسابقه"}
