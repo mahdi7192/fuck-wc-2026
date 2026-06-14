@@ -1,5 +1,5 @@
 {
-  "name": "fuck-wc-2026",
+  "name": "football-box",
   "type": "module",
   "version": "0.0.1",
   "engines": {
@@ -14,11 +14,11 @@
   "dependencies": {
     "@astrojs/node": "^10.1.4",
     "@astrojs/react": "^5.0.7",
-    "@astrojs/vercel": "^10.0.8",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
     "astro": "^6.4.6",
     "react": "^19.2.7",
     "react-dom": "^19.2.7"
   }
+}
 }
