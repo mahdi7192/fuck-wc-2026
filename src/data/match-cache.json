@@ -1,0 +1,1284 @@
+{
+  "matches": {
+    "timestamp": 1781469741036,
+    "list": [
+      {
+        "id": "760421",
+        "utcDate": "2026-06-14T04:00Z",
+        "status": "FINISHED",
+        "elapsed": 906,
+        "homeTeam": {
+          "name": "Australia",
+          "crest": "https://a.espncdn.com/i/teamlogos/countries/500/aus.png"
+        },
+        "awayTeam": {
+          "name": "Türkiye",
+          "crest": "https://a.espncdn.com/i/teamlogos/countries/500/tur.png"
+        },
+        "score": {
+          "home": 2,
+          "away": 0
+        }
+      },
+      {
+        "id": "760422",
+        "utcDate": "2026-06-14T17:00Z",
+        "status": "FINISHED",
+        "elapsed": 906,
+        "homeTeam": {
+          "name": "Germany",
+          "crest": "https://a.espncdn.com/i/teamlogos/countries/500/ger.png"
+        },
+        "awayTeam": {
+          "name": "Curaçao",
+          "crest": "https://a.espncdn.com/i/teamlogos/soccer/500/11678.png"
+        },
+        "score": {
+          "home": 7,
+          "away": 1
+        }
+      },
+      {
+        "id": "760425",
+        "utcDate": "2026-06-14T20:00Z",
+        "status": "LIVE",
+        "elapsed": 42,
+        "homeTeam": {
+          "name": "Netherlands",
+          "crest": "https://a.espncdn.com/i/teamlogos/countries/500/ned.png"
+        },
+        "awayTeam": {
+          "name": "Japan",
+          "crest": "https://a.espncdn.com/i/teamlogos/countries/500/jpn.png"
+        },
+        "score": {
+          "home": 0,
+          "away": 0
+        }
+      },
+      {
+        "id": "760423",
+        "utcDate": "2026-06-14T23:00Z",
+        "status": "WAITING",
+        "elapsed": 0,
+        "homeTeam": {
+          "name": "Ivory Coast",
+          "crest": "https://a.espncdn.com/i/teamlogos/countries/500/civ.png"
+        },
+        "awayTeam": {
+          "name": "Ecuador",
+          "crest": "https://a.espncdn.com/i/teamlogos/countries/500/ecu.png"
+        },
+        "score": {
+          "home": 0,
+          "away": 0
+        }
+      },
+      {
+        "id": "760424",
+        "utcDate": "2026-06-15T02:00Z",
+        "status": "WAITING",
+        "elapsed": 0,
+        "homeTeam": {
+          "name": "Sweden",
+          "crest": "https://a.espncdn.com/i/teamlogos/countries/500/swe.png"
+        },
+        "awayTeam": {
+          "name": "Tunisia",
+          "crest": "https://a.espncdn.com/i/teamlogos/countries/500/tun.png"
+        },
+        "score": {
+          "home": 0,
+          "away": 0
+        }
+      }
+    ]
+  },
+  "details": {
+    "760421": {
+      "timestamp": 1781466838726,
+      "match": {
+        "id": "760421",
+        "utcDate": "2026-06-14T04:00Z",
+        "status": "FINISHED",
+        "elapsed": 0,
+        "homeTeam": {
+          "id": "628",
+          "name": "Australia",
+          "crest": "https://a.espncdn.com/i/teamlogos/countries/500/aus.png",
+          "lineup": [
+            {
+              "id": "335240",
+              "name": "Patrick Beach",
+              "position": "GOALKEEPER",
+              "shirtNumber": 18,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/335240.png"
+            },
+            {
+              "id": "207461",
+              "name": "Harry Souttar",
+              "position": "DEFENDER",
+              "shirtNumber": 19,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/207461.png"
+            },
+            {
+              "id": "207350",
+              "name": "Cameron Burgess",
+              "position": "DEFENDER",
+              "shirtNumber": 21,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/207350.png"
+            },
+            {
+              "id": "332081",
+              "name": "Alessandro Circati",
+              "position": "DEFENDER",
+              "shirtNumber": 3,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/332081.png"
+            },
+            {
+              "id": "328541",
+              "name": "Jordan Bos",
+              "position": "DEFENDER",
+              "shirtNumber": 5,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/328541.png"
+            },
+            {
+              "id": "267053",
+              "name": "Jacob Italiano",
+              "position": "DEFENDER",
+              "shirtNumber": 4,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/267053.png"
+            },
+            {
+              "id": "403528",
+              "name": "Paul Okon-Engstler",
+              "position": "MIDFIELDER",
+              "shirtNumber": 24,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/403528.png"
+            },
+            {
+              "id": "241031",
+              "name": "Aiden O'Neill",
+              "position": "MIDFIELDER",
+              "shirtNumber": 13,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/241031.png"
+            },
+            {
+              "id": "328535",
+              "name": "Nestory Irankunda",
+              "position": "MIDFIELDER",
+              "shirtNumber": 17,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/328535.png"
+            },
+            {
+              "id": "260643",
+              "name": "Connor Metcalfe",
+              "position": "MIDFIELDER",
+              "shirtNumber": 8,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/260643.png"
+            },
+            {
+              "id": "302688",
+              "name": "Mohamed Toure",
+              "position": "FORWARD",
+              "shirtNumber": 9,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/302688.png"
+            }
+          ],
+          "bench": [
+            {
+              "id": "141438",
+              "name": "Mathew Ryan",
+              "position": "MIDFIELDER",
+              "shirtNumber": 1,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/141438.png"
+            },
+            {
+              "id": "291697",
+              "name": "Kai Trewin",
+              "position": "MIDFIELDER",
+              "shirtNumber": 15,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/291697.png"
+            },
+            {
+              "id": "276917",
+              "name": "Cameron Devlin",
+              "position": "MIDFIELDER",
+              "shirtNumber": 14,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/276917.png"
+            },
+            {
+              "id": "159494",
+              "name": "Paul Izzo",
+              "position": "MIDFIELDER",
+              "shirtNumber": 12,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/159494.png"
+            },
+            {
+              "id": "330259",
+              "name": "Cristian Volpato",
+              "position": "MIDFIELDER",
+              "shirtNumber": 20,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/330259.png"
+            },
+            {
+              "id": "172137",
+              "name": "Jason Geria",
+              "position": "MIDFIELDER",
+              "shirtNumber": 6,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/172137.png"
+            },
+            {
+              "id": "181707",
+              "name": "Awer Mabil",
+              "position": "MIDFIELDER",
+              "shirtNumber": 11,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/181707.png"
+            },
+            {
+              "id": "200414",
+              "name": "Aziz Behich",
+              "position": "MIDFIELDER",
+              "shirtNumber": 16,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/200414.png"
+            },
+            {
+              "id": "140994",
+              "name": "Mathew Leckie",
+              "position": "MIDFIELDER",
+              "shirtNumber": 7,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/140994.png"
+            },
+            {
+              "id": "227289",
+              "name": "Ajdin Hrustic",
+              "position": "MIDFIELDER",
+              "shirtNumber": 10,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/227289.png"
+            },
+            {
+              "id": "312261",
+              "name": "Tete Yengi",
+              "position": "MIDFIELDER",
+              "shirtNumber": 26,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/312261.png"
+            },
+            {
+              "id": "392320",
+              "name": "Lucas Herrington",
+              "position": "MIDFIELDER",
+              "shirtNumber": 25,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/392320.png"
+            },
+            {
+              "id": "159502",
+              "name": "Milos Degenek",
+              "position": "MIDFIELDER",
+              "shirtNumber": 2,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/159502.png"
+            },
+            {
+              "id": "178071",
+              "name": "Jackson Irvine",
+              "position": "MIDFIELDER",
+              "shirtNumber": 22,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/178071.png"
+            },
+            {
+              "id": "318429",
+              "name": "Nishan Velupillay",
+              "position": "MIDFIELDER",
+              "shirtNumber": 23,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/318429.png"
+            }
+          ]
+        },
+        "awayTeam": {
+          "id": "465",
+          "name": "Türkiye",
+          "crest": "https://a.espncdn.com/i/teamlogos/countries/500/tur.png",
+          "lineup": [
+            {
+              "id": "222922",
+              "name": "Ugurcan Çakir",
+              "position": "GOALKEEPER",
+              "shirtNumber": 23,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/222922.png"
+            },
+            {
+              "id": "193149",
+              "name": "Abdülkerim Bardakçi",
+              "position": "DEFENDER",
+              "shirtNumber": 14,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/193149.png"
+            },
+            {
+              "id": "267178",
+              "name": "Merih Demiral",
+              "position": "DEFENDER",
+              "shirtNumber": 3,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/267178.png"
+            },
+            {
+              "id": "238318",
+              "name": "Ferdi Kadioglu",
+              "position": "DEFENDER",
+              "shirtNumber": 20,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/238318.png"
+            },
+            {
+              "id": "271873",
+              "name": "Zeki Çelik",
+              "position": "DEFENDER",
+              "shirtNumber": 2,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/271873.png"
+            },
+            {
+              "id": "272700",
+              "name": "Orkun Kökçü",
+              "position": "MIDFIELDER",
+              "shirtNumber": 6,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/272700.png"
+            },
+            {
+              "id": "170785",
+              "name": "Hakan Çalhanoglu",
+              "position": "MIDFIELDER",
+              "shirtNumber": 10,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/170785.png"
+            },
+            {
+              "id": "305629",
+              "name": "Ismail Yüksek",
+              "position": "MIDFIELDER",
+              "shirtNumber": 16,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/305629.png"
+            },
+            {
+              "id": "306789",
+              "name": "Kerem Aktürkoglu",
+              "position": "FORWARD",
+              "shirtNumber": 7,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/306789.png"
+            },
+            {
+              "id": "322538",
+              "name": "Baris Alper Yilmaz",
+              "position": "MIDFIELDER",
+              "shirtNumber": 21,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/322538.png"
+            },
+            {
+              "id": "310452",
+              "name": "Arda Güler",
+              "position": "MIDFIELDER",
+              "shirtNumber": 8,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/310452.png"
+            }
+          ],
+          "bench": [
+            {
+              "id": "266575",
+              "name": "Yunus Akgün",
+              "position": "MIDFIELDER",
+              "shirtNumber": 19,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/266575.png"
+            },
+            {
+              "id": "350513",
+              "name": "Deniz Gül",
+              "position": "MIDFIELDER",
+              "shirtNumber": 9,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/350513.png"
+            },
+            {
+              "id": "159146",
+              "name": "Kaan Ayhan",
+              "position": "MIDFIELDER",
+              "shirtNumber": 22,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/159146.png"
+            },
+            {
+              "id": "366509",
+              "name": "Kenan Yildiz",
+              "position": "MIDFIELDER",
+              "shirtNumber": 11,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/366509.png"
+            },
+            {
+              "id": "322813",
+              "name": "Oguz Aydin",
+              "position": "MIDFIELDER",
+              "shirtNumber": 24,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/322813.png"
+            },
+            {
+              "id": "274272",
+              "name": "Altay Bayindir",
+              "position": "MIDFIELDER",
+              "shirtNumber": 12,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/274272.png"
+            },
+            {
+              "id": "225563",
+              "name": "Salih Özcan",
+              "position": "MIDFIELDER",
+              "shirtNumber": 5,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/225563.png"
+            },
+            {
+              "id": "355369",
+              "name": "Can Uzun",
+              "position": "MIDFIELDER",
+              "shirtNumber": 26,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/355369.png"
+            },
+            {
+              "id": "266565",
+              "name": "Ozan Kabak",
+              "position": "MIDFIELDER",
+              "shirtNumber": 15,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/266565.png"
+            },
+            {
+              "id": "322807",
+              "name": "Samet Akaydin",
+              "position": "MIDFIELDER",
+              "shirtNumber": 25,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/322807.png"
+            },
+            {
+              "id": "211923",
+              "name": "Irfan Can Kahveci",
+              "position": "MIDFIELDER",
+              "shirtNumber": 17,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/211923.png"
+            },
+            {
+              "id": "230757",
+              "name": "Çaglar Söyüncü",
+              "position": "MIDFIELDER",
+              "shirtNumber": 4,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/230757.png"
+            },
+            {
+              "id": "287678",
+              "name": "Eren Elmali",
+              "position": "MIDFIELDER",
+              "shirtNumber": 13,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/287678.png"
+            },
+            {
+              "id": "266002",
+              "name": "Mert Müldür",
+              "position": "MIDFIELDER",
+              "shirtNumber": 18,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/266002.png"
+            },
+            {
+              "id": "124880",
+              "name": "Mert Günok",
+              "position": "MIDFIELDER",
+              "shirtNumber": 1,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/124880.png"
+            }
+          ]
+        },
+        "score": {
+          "home": 2,
+          "away": 0
+        }
+      }
+    },
+    "760422": {
+      "timestamp": 1781465313426,
+      "match": {
+        "id": "760422",
+        "utcDate": "2026-06-14T17:00Z",
+        "status": "FINISHED",
+        "elapsed": 0,
+        "homeTeam": {
+          "id": "481",
+          "name": "Germany",
+          "crest": "https://a.espncdn.com/i/teamlogos/countries/500/ger.png",
+          "lineup": [
+            {
+              "id": "84774",
+              "name": "Manuel Neuer",
+              "position": "GOALKEEPER",
+              "shirtNumber": 1,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/84774.png"
+            },
+            {
+              "id": "286828",
+              "name": "Nico Schlotterbeck",
+              "position": "DEFENDER",
+              "shirtNumber": 15,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/286828.png"
+            },
+            {
+              "id": "188052",
+              "name": "Jonathan Tah",
+              "position": "DEFENDER",
+              "shirtNumber": 4,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/188052.png"
+            },
+            {
+              "id": "120829",
+              "name": "Nathaniel Brown",
+              "position": "DEFENDER",
+              "shirtNumber": 18,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/120829.png"
+            },
+            {
+              "id": "190161",
+              "name": "Joshua Kimmich",
+              "position": "DEFENDER",
+              "shirtNumber": 6,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/190161.png"
+            },
+            {
+              "id": "303821",
+              "name": "Jamal Musiala",
+              "position": "MIDFIELDER",
+              "shirtNumber": 10,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/303821.png"
+            },
+            {
+              "id": "359370",
+              "name": "Aleksandar Pavlovic",
+              "position": "MIDFIELDER",
+              "shirtNumber": 5,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/359370.png"
+            },
+            {
+              "id": "281122",
+              "name": "Felix Nmecha",
+              "position": "MIDFIELDER",
+              "shirtNumber": 23,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/281122.png"
+            },
+            {
+              "id": "231182",
+              "name": "Kai Havertz",
+              "position": "FORWARD",
+              "shirtNumber": 7,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/231182.png"
+            },
+            {
+              "id": "303748",
+              "name": "Florian Wirtz",
+              "position": "MIDFIELDER",
+              "shirtNumber": 17,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/303748.png"
+            },
+            {
+              "id": "202641",
+              "name": "Leroy Sané",
+              "position": "MIDFIELDER",
+              "shirtNumber": 19,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/202641.png"
+            }
+          ],
+          "bench": [
+            {
+              "id": "249548",
+              "name": "David Raum",
+              "position": "MIDFIELDER",
+              "shirtNumber": 22,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/249548.png"
+            },
+            {
+              "id": "298349",
+              "name": "Nick Woltemade",
+              "position": "MIDFIELDER",
+              "shirtNumber": 11,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/298349.png"
+            },
+            {
+              "id": "290232",
+              "name": "Angelo Stiller",
+              "position": "MIDFIELDER",
+              "shirtNumber": 16,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/290232.png"
+            },
+            {
+              "id": "273300",
+              "name": "Deniz Undav",
+              "position": "MIDFIELDER",
+              "shirtNumber": 26,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/273300.png"
+            },
+            {
+              "id": "220714",
+              "name": "Waldemar Anton",
+              "position": "MIDFIELDER",
+              "shirtNumber": 3,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/220714.png"
+            },
+            {
+              "id": "290811",
+              "name": "Jamie Leweling",
+              "position": "MIDFIELDER",
+              "shirtNumber": 9,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/290811.png"
+            },
+            {
+              "id": "205750",
+              "name": "Alexander Nübel",
+              "position": "MIDFIELDER",
+              "shirtNumber": 21,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/205750.png"
+            },
+            {
+              "id": "174550",
+              "name": "Leon Goretzka",
+              "position": "MIDFIELDER",
+              "shirtNumber": 8,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/174550.png"
+            },
+            {
+              "id": "169438",
+              "name": "Antonio Rüdiger",
+              "position": "MIDFIELDER",
+              "shirtNumber": 2,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/169438.png"
+            },
+            {
+              "id": "303444",
+              "name": "Malick Thiaw",
+              "position": "MIDFIELDER",
+              "shirtNumber": 24,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/303444.png"
+            },
+            {
+              "id": "210818",
+              "name": "Nadiem Amiri",
+              "position": "MIDFIELDER",
+              "shirtNumber": 20,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/210818.png"
+            },
+            {
+              "id": "138213",
+              "name": "Oliver Baumann",
+              "position": "MIDFIELDER",
+              "shirtNumber": 12,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/138213.png"
+            },
+            {
+              "id": "132659",
+              "name": "Pascal Gross",
+              "position": "MIDFIELDER",
+              "shirtNumber": 13,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/132659.png"
+            },
+            {
+              "id": "364897",
+              "name": "Assan Ouédraogo",
+              "position": "MIDFIELDER",
+              "shirtNumber": 25,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/364897.png"
+            },
+            {
+              "id": "290639",
+              "name": "Maximilian Beier",
+              "position": "MIDFIELDER",
+              "shirtNumber": 14,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/290639.png"
+            }
+          ]
+        },
+        "awayTeam": {
+          "id": "11678",
+          "name": "Curaçao",
+          "crest": "https://a.espncdn.com/i/teamlogos/soccer/500/11678.png",
+          "lineup": [
+            {
+              "id": "127444",
+              "name": "Eloy Room",
+              "position": "GOALKEEPER",
+              "shirtNumber": 1,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/127444.png"
+            },
+            {
+              "id": "245918",
+              "name": "Armando Obispo",
+              "position": "DEFENDER",
+              "shirtNumber": 18,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/245918.png"
+            },
+            {
+              "id": "188411",
+              "name": "Riechedly Bazoer",
+              "position": "DEFENDER",
+              "shirtNumber": 23,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/188411.png"
+            },
+            {
+              "id": "335203",
+              "name": "Deveron Fonville",
+              "position": "DEFENDER",
+              "shirtNumber": 24,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/335203.png"
+            },
+            {
+              "id": "224786",
+              "name": "Sherel Floranus",
+              "position": "DEFENDER",
+              "shirtNumber": 5,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/224786.png"
+            },
+            {
+              "id": "297299",
+              "name": "Sontje Hansen",
+              "position": "MIDFIELDER",
+              "shirtNumber": 12,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/297299.png"
+            },
+            {
+              "id": "138664",
+              "name": "Leandro Bacuna",
+              "position": "MIDFIELDER",
+              "shirtNumber": 10,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/138664.png"
+            },
+            {
+              "id": "276218",
+              "name": "Tahith Chong",
+              "position": "MIDFIELDER",
+              "shirtNumber": 21,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/276218.png"
+            },
+            {
+              "id": "216287",
+              "name": "Juninho Bacuna",
+              "position": "MIDFIELDER",
+              "shirtNumber": 7,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/216287.png"
+            },
+            {
+              "id": "317285",
+              "name": "Livano Comenencia",
+              "position": "MIDFIELDER",
+              "shirtNumber": 8,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/317285.png"
+            },
+            {
+              "id": "167213",
+              "name": "Jürgen Locadia",
+              "position": "FORWARD",
+              "shirtNumber": 9,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/167213.png"
+            }
+          ],
+          "bench": [
+            {
+              "id": "306553",
+              "name": "Ar'jany Martha",
+              "position": "MIDFIELDER",
+              "shirtNumber": 15,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/306553.png"
+            },
+            {
+              "id": "246281",
+              "name": "Juriën Gaari",
+              "position": "MIDFIELDER",
+              "shirtNumber": 3,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/246281.png"
+            },
+            {
+              "id": "297542",
+              "name": "Tyrick Bodak",
+              "position": "MIDFIELDER",
+              "shirtNumber": 25,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/297542.png"
+            },
+            {
+              "id": "262738",
+              "name": "Kevin Felida",
+              "position": "MIDFIELDER",
+              "shirtNumber": 22,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/262738.png"
+            },
+            {
+              "id": "178433",
+              "name": "Joshua Brenet",
+              "position": "MIDFIELDER",
+              "shirtNumber": 20,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/178433.png"
+            },
+            {
+              "id": "178273",
+              "name": "Gervane Kastaneer",
+              "position": "MIDFIELDER",
+              "shirtNumber": 19,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/178273.png"
+            },
+            {
+              "id": "177058",
+              "name": "Brandley Kuwas",
+              "position": "MIDFIELDER",
+              "shirtNumber": 17,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/177058.png"
+            },
+            {
+              "id": "359132",
+              "name": "Tyrese Noslin",
+              "position": "MIDFIELDER",
+              "shirtNumber": 13,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/359132.png"
+            },
+            {
+              "id": "301441",
+              "name": "Jearl Margaritha",
+              "position": "MIDFIELDER",
+              "shirtNumber": 16,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/301441.png"
+            },
+            {
+              "id": "310925",
+              "name": "Jeremy Antonisse",
+              "position": "MIDFIELDER",
+              "shirtNumber": 11,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/310925.png"
+            },
+            {
+              "id": "301456",
+              "name": "Shurandy Sambo",
+              "position": "MIDFIELDER",
+              "shirtNumber": 2,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/301456.png"
+            },
+            {
+              "id": "262109",
+              "name": "Trevor Doornbusch",
+              "position": "MIDFIELDER",
+              "shirtNumber": 26,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/262109.png"
+            },
+            {
+              "id": "188452",
+              "name": "Kenji Gorré",
+              "position": "MIDFIELDER",
+              "shirtNumber": 14,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/188452.png"
+            },
+            {
+              "id": "273295",
+              "name": "Godfried Roemeratoe",
+              "position": "MIDFIELDER",
+              "shirtNumber": 6,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/273295.png"
+            },
+            {
+              "id": "270807",
+              "name": "Roshon van Eijma",
+              "position": "MIDFIELDER",
+              "shirtNumber": 4,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/270807.png"
+            }
+          ]
+        },
+        "score": {
+          "home": 7,
+          "away": 1
+        }
+      }
+    },
+    "760425": {
+      "timestamp": 1781470535487,
+      "match": {
+        "id": "760425",
+        "utcDate": "2026-06-14T20:00Z",
+        "status": "LIVE",
+        "elapsed": 453,
+        "homeTeam": {
+          "id": "449",
+          "name": "Netherlands",
+          "crest": "https://a.espncdn.com/i/teamlogos/countries/500/ned.png",
+          "lineup": [
+            {
+              "id": "291609",
+              "name": "Bart Verbruggen",
+              "position": "GOALKEEPER",
+              "shirtNumber": 1,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/291609.png"
+            },
+            {
+              "id": "157892",
+              "name": "Virgil van Dijk",
+              "position": "DEFENDER",
+              "shirtNumber": 4,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/157892.png"
+            },
+            {
+              "id": "282583",
+              "name": "Jan Paul van Hecke",
+              "position": "DEFENDER",
+              "shirtNumber": 6,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/282583.png"
+            },
+            {
+              "id": "296512",
+              "name": "Micky van de Ven",
+              "position": "DEFENDER",
+              "shirtNumber": 15,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/296512.png"
+            },
+            {
+              "id": "213248",
+              "name": "Denzel Dumfries",
+              "position": "DEFENDER",
+              "shirtNumber": 22,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/213248.png"
+            },
+            {
+              "id": "219022",
+              "name": "Frenkie de Jong",
+              "position": "MIDFIELDER",
+              "shirtNumber": 21,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/219022.png"
+            },
+            {
+              "id": "261328",
+              "name": "Tijjani Reijnders",
+              "position": "MIDFIELDER",
+              "shirtNumber": 14,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/261328.png"
+            },
+            {
+              "id": "274632",
+              "name": "Ryan Gravenberch",
+              "position": "MIDFIELDER",
+              "shirtNumber": 8,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/274632.png"
+            },
+            {
+              "id": "259481",
+              "name": "Donyell Malen",
+              "position": "FORWARD",
+              "shirtNumber": 18,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/259481.png"
+            },
+            {
+              "id": "249524",
+              "name": "Cody Gakpo",
+              "position": "FORWARD",
+              "shirtNumber": 11,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/249524.png"
+            },
+            {
+              "id": "284792",
+              "name": "Crysencio Summerville",
+              "position": "FORWARD",
+              "shirtNumber": 24,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/284792.png"
+            }
+          ],
+          "bench": [
+            {
+              "id": "282186",
+              "name": "Mats Wieffer",
+              "position": "MIDFIELDER",
+              "shirtNumber": 12,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/282186.png"
+            },
+            {
+              "id": "264828",
+              "name": "Lutsharel Geertruida",
+              "position": "MIDFIELDER",
+              "shirtNumber": 2,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/264828.png"
+            },
+            {
+              "id": "245916",
+              "name": "Justin Kluivert",
+              "position": "MIDFIELDER",
+              "shirtNumber": 7,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/245916.png"
+            },
+            {
+              "id": "258968",
+              "name": "Teun Koopmeiners",
+              "position": "MIDFIELDER",
+              "shirtNumber": 20,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/258968.png"
+            },
+            {
+              "id": "240965",
+              "name": "Guus Til",
+              "position": "MIDFIELDER",
+              "shirtNumber": 16,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/240965.png"
+            },
+            {
+              "id": "301449",
+              "name": "Robin Roefs",
+              "position": "MIDFIELDER",
+              "shirtNumber": 13,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/301449.png"
+            },
+            {
+              "id": "282230",
+              "name": "Quinten Timber",
+              "position": "MIDFIELDER",
+              "shirtNumber": 26,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/282230.png"
+            },
+            {
+              "id": "159248",
+              "name": "Nathan Aké",
+              "position": "MIDFIELDER",
+              "shirtNumber": 5,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/159248.png"
+            },
+            {
+              "id": "177042",
+              "name": "Wout Weghorst",
+              "position": "MIDFIELDER",
+              "shirtNumber": 9,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/177042.png"
+            },
+            {
+              "id": "177821",
+              "name": "Mark Flekken",
+              "position": "MIDFIELDER",
+              "shirtNumber": 23,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/177821.png"
+            },
+            {
+              "id": "159255",
+              "name": "Memphis Depay",
+              "position": "MIDFIELDER",
+              "shirtNumber": 10,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/159255.png"
+            },
+            {
+              "id": "255344",
+              "name": "Noa Lang",
+              "position": "MIDFIELDER",
+              "shirtNumber": 17,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/255344.png"
+            },
+            {
+              "id": "146335",
+              "name": "Marten de Roon",
+              "position": "MIDFIELDER",
+              "shirtNumber": 3,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/146335.png"
+            },
+            {
+              "id": "353951",
+              "name": "Jorrel Hato",
+              "position": "MIDFIELDER",
+              "shirtNumber": 25,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/353951.png"
+            },
+            {
+              "id": "282229",
+              "name": "Brian Brobbey",
+              "position": "MIDFIELDER",
+              "shirtNumber": 19,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/282229.png"
+            }
+          ]
+        },
+        "awayTeam": {
+          "id": "627",
+          "name": "Japan",
+          "crest": "https://a.espncdn.com/i/teamlogos/countries/500/jpn.png",
+          "lineup": [
+            {
+              "id": "265958",
+              "name": "Zion Suzuki",
+              "position": "GOALKEEPER",
+              "shirtNumber": 1,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/265958.png"
+            },
+            {
+              "id": "202728",
+              "name": "Shogo Taniguchi",
+              "position": "DEFENDER",
+              "shirtNumber": 3,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/202728.png"
+            },
+            {
+              "id": "97111",
+              "name": "Hiroki Ito",
+              "position": "DEFENDER",
+              "shirtNumber": 21,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/97111.png"
+            },
+            {
+              "id": "276279",
+              "name": "Tsuyoshi Watanabe",
+              "position": "DEFENDER",
+              "shirtNumber": 16,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/276279.png"
+            },
+            {
+              "id": "219362",
+              "name": "Daichi Kamada",
+              "position": "MIDFIELDER",
+              "shirtNumber": 15,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/219362.png"
+            },
+            {
+              "id": "357030",
+              "name": "Kaishu Sano",
+              "position": "MIDFIELDER",
+              "shirtNumber": 24,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/357030.png"
+            },
+            {
+              "id": "265953",
+              "name": "Keito Nakamura",
+              "position": "MIDFIELDER",
+              "shirtNumber": 13,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/265953.png"
+            },
+            {
+              "id": "219627",
+              "name": "Ritsu Doan",
+              "position": "MIDFIELDER",
+              "shirtNumber": 10,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/219627.png"
+            },
+            {
+              "id": "274277",
+              "name": "Ayase Ueda",
+              "position": "FORWARD",
+              "shirtNumber": 18,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/274277.png"
+            },
+            {
+              "id": "286347",
+              "name": "Daizen Maeda",
+              "position": "FORWARD",
+              "shirtNumber": 11,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/286347.png"
+            },
+            {
+              "id": "256587",
+              "name": "Takefusa Kubo",
+              "position": "FORWARD",
+              "shirtNumber": 8,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/256587.png"
+            }
+          ],
+          "bench": [
+            {
+              "id": "219350",
+              "name": "Junya Ito",
+              "position": "MIDFIELDER",
+              "shirtNumber": 14,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/219350.png"
+            },
+            {
+              "id": "238016",
+              "name": "Koki Ogawa",
+              "position": "MIDFIELDER",
+              "shirtNumber": 19,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/238016.png"
+            },
+            {
+              "id": "119082",
+              "name": "Yuto Nagatomo",
+              "position": "MIDFIELDER",
+              "shirtNumber": 5,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/119082.png"
+            },
+            {
+              "id": "362959",
+              "name": "Kento Shiogai",
+              "position": "MIDFIELDER",
+              "shirtNumber": 26,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/362959.png"
+            },
+            {
+              "id": "346208",
+              "name": "Keisuke Goto",
+              "position": "MIDFIELDER",
+              "shirtNumber": 9,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/346208.png"
+            },
+            {
+              "id": "303031",
+              "name": "Yuito Suzuki",
+              "position": "MIDFIELDER",
+              "shirtNumber": 17,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/303031.png"
+            },
+            {
+              "id": "258270",
+              "name": "Ayumu Seko",
+              "position": "MIDFIELDER",
+              "shirtNumber": 20,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/258270.png"
+            },
+            {
+              "id": "312924",
+              "name": "Tomoki Hayakawa",
+              "position": "MIDFIELDER",
+              "shirtNumber": 23,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/312924.png"
+            },
+            {
+              "id": "271352",
+              "name": "Shuto Machino",
+              "position": "MIDFIELDER",
+              "shirtNumber": 6,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/271352.png"
+            },
+            {
+              "id": "238033",
+              "name": "Kou Itakura",
+              "position": "MIDFIELDER",
+              "shirtNumber": 4,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/238033.png"
+            },
+            {
+              "id": "333663",
+              "name": "Junnosuke Suzuki",
+              "position": "MIDFIELDER",
+              "shirtNumber": 25,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/333663.png"
+            },
+            {
+              "id": "255723",
+              "name": "Keisuke Osako",
+              "position": "MIDFIELDER",
+              "shirtNumber": 12,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/255723.png"
+            },
+            {
+              "id": "253173",
+              "name": "Ao Tanaka",
+              "position": "MIDFIELDER",
+              "shirtNumber": 7,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/253173.png"
+            },
+            {
+              "id": "265965",
+              "name": "Yukinari Sugawara",
+              "position": "MIDFIELDER",
+              "shirtNumber": 2,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/265965.png"
+            },
+            {
+              "id": "238004",
+              "name": "Takehiro Tomiyasu",
+              "position": "MIDFIELDER",
+              "shirtNumber": 22,
+              "photoUrl": "https://a.espncdn.com/i/headshots/soccer/players/full/238004.png"
+            }
+          ]
+        },
+        "score": {
+          "home": 0,
+          "away": 0
+        }
+      }
+    }
+  }
+}

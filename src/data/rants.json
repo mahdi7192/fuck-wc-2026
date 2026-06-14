@@ -1,0 +1,204 @@
+{
+  "rants": {
+    "760423": {
+      "171771": {
+        "totalRants": 1,
+        "rants": {
+          "back": 1
+        },
+        "playerName": "Enner Valencia",
+        "playerPhoto": "https://r2.thesportsdb.com/images/media/player/cutout/gplbd81668544491.png",
+        "teamId": "209",
+        "teamName": "اکوادور",
+        "teamCrest": "https://a.espncdn.com/i/teamlogos/countries/500/ecu.png"
+      },
+      "207921": {
+        "totalRants": 2,
+        "rants": {
+          "miss": 1,
+          "pass": 1
+        },
+        "playerName": "Hernán Galíndez",
+        "playerPhoto": "https://r2.thesportsdb.com/images/media/player/cutout/i7jwvi1763739794.png",
+        "teamId": "209",
+        "teamName": "اکوادور",
+        "teamCrest": "https://a.espncdn.com/i/teamlogos/countries/500/ecu.png"
+      },
+      "250888": {
+        "totalRants": 1,
+        "rants": {
+          "pass": 1
+        },
+        "playerName": "Ghislain Konan",
+        "playerPhoto": "https://r2.thesportsdb.com/images/media/player/cutout/rj1ph21608638246.png",
+        "teamId": "4789",
+        "teamName": "ساحل عاج",
+        "teamCrest": "https://a.espncdn.com/i/teamlogos/countries/500/civ.png"
+      },
+      "277352": {
+        "totalRants": 1,
+        "rants": {
+          "card": 1
+        },
+        "playerName": "Gonzalo Plata",
+        "playerPhoto": "https://r2.thesportsdb.com/images/media/player/cutout/sdclx01751003063.png",
+        "teamId": "209",
+        "teamName": "اکوادور",
+        "teamCrest": "https://a.espncdn.com/i/teamlogos/countries/500/ecu.png"
+      },
+      "287005": {
+        "totalRants": 1,
+        "rants": {
+          "pass": 1
+        },
+        "playerName": "Willian Pacho",
+        "playerPhoto": "https://r2.thesportsdb.com/images/media/player/cutout/73q3q11766335492.png",
+        "teamId": "209",
+        "teamName": "اکوادور",
+        "teamCrest": "https://a.espncdn.com/i/teamlogos/countries/500/ecu.png"
+      },
+      "289877": {
+        "totalRants": 1,
+        "rants": {
+          "pass": 1
+        },
+        "playerName": "Moisés Caicedo",
+        "playerPhoto": "https://r2.thesportsdb.com/images/media/player/cutout/u3feyy1757002398.png",
+        "teamId": "209",
+        "teamName": "اکوادور",
+        "teamCrest": "https://a.espncdn.com/i/teamlogos/countries/500/ecu.png"
+      },
+      "292062": {
+        "totalRants": 2,
+        "rants": {
+          "walk": 1,
+          "miss": 1
+        },
+        "playerName": "Piero Hincapié",
+        "playerPhoto": "https://r2.thesportsdb.com/images/media/player/cutout/7dltx01769330396.png",
+        "teamId": "209",
+        "teamName": "اکوادور",
+        "teamCrest": "https://a.espncdn.com/i/teamlogos/countries/500/ecu.png"
+      },
+      "297150": {
+        "totalRants": 1,
+        "rants": {
+          "air": 1
+        },
+        "playerName": "Pedro Vite",
+        "playerPhoto": "https://r2.thesportsdb.com/images/media/player/cutout/vnl09k1780328438.png",
+        "teamId": "209",
+        "teamName": "اکوادور",
+        "teamCrest": "https://a.espncdn.com/i/teamlogos/countries/500/ecu.png"
+      },
+      "336589": {
+        "totalRants": 1,
+        "rants": {
+          "lazy": 1
+        },
+        "playerName": "Joel Ordóñez",
+        "playerPhoto": "https://r2.thesportsdb.com/images/media/player/cutout/7te4j61767634434.png",
+        "teamId": "209",
+        "teamName": "اکوادور",
+        "teamCrest": "https://a.espncdn.com/i/teamlogos/countries/500/ecu.png"
+      },
+      "359108": {
+        "totalRants": 1,
+        "rants": {
+          "miss": 1
+        },
+        "playerName": "Bazoumana Touré",
+        "playerPhoto": "https://r2.thesportsdb.com/images/media/player/cutout/sf2uwx1763494642.png",
+        "teamId": "4789",
+        "teamName": "ساحل عاج",
+        "teamCrest": "https://a.espncdn.com/i/teamlogos/countries/500/civ.png"
+      }
+    }
+  },
+  "totals": {
+    "players": {
+      "171771": {
+        "totalRants": 1,
+        "name": "Enner Valencia",
+        "photo": "https://r2.thesportsdb.com/images/media/player/cutout/gplbd81668544491.png",
+        "teamId": "209",
+        "teamName": "اکوادور"
+      },
+      "207921": {
+        "totalRants": 2,
+        "name": "Hernán Galíndez",
+        "photo": "https://r2.thesportsdb.com/images/media/player/cutout/i7jwvi1763739794.png",
+        "teamId": "209",
+        "teamName": "اکوادور"
+      },
+      "250888": {
+        "totalRants": 1,
+        "name": "Ghislain Konan",
+        "photo": "https://r2.thesportsdb.com/images/media/player/cutout/rj1ph21608638246.png",
+        "teamId": "4789",
+        "teamName": "ساحل عاج"
+      },
+      "277352": {
+        "totalRants": 1,
+        "name": "Gonzalo Plata",
+        "photo": "https://r2.thesportsdb.com/images/media/player/cutout/sdclx01751003063.png",
+        "teamId": "209",
+        "teamName": "اکوادور"
+      },
+      "287005": {
+        "totalRants": 1,
+        "name": "Willian Pacho",
+        "photo": "https://r2.thesportsdb.com/images/media/player/cutout/73q3q11766335492.png",
+        "teamId": "209",
+        "teamName": "اکوادور"
+      },
+      "289877": {
+        "totalRants": 1,
+        "name": "Moisés Caicedo",
+        "photo": "https://r2.thesportsdb.com/images/media/player/cutout/u3feyy1757002398.png",
+        "teamId": "209",
+        "teamName": "اکوادور"
+      },
+      "292062": {
+        "totalRants": 2,
+        "name": "Piero Hincapié",
+        "photo": "https://r2.thesportsdb.com/images/media/player/cutout/7dltx01769330396.png",
+        "teamId": "209",
+        "teamName": "اکوادور"
+      },
+      "297150": {
+        "totalRants": 1,
+        "name": "Pedro Vite",
+        "photo": "https://r2.thesportsdb.com/images/media/player/cutout/vnl09k1780328438.png",
+        "teamId": "209",
+        "teamName": "اکوادور"
+      },
+      "336589": {
+        "totalRants": 1,
+        "name": "Joel Ordóñez",
+        "photo": "https://r2.thesportsdb.com/images/media/player/cutout/7te4j61767634434.png",
+        "teamId": "209",
+        "teamName": "اکوادور"
+      },
+      "359108": {
+        "totalRants": 1,
+        "name": "Bazoumana Touré",
+        "photo": "https://r2.thesportsdb.com/images/media/player/cutout/sf2uwx1763494642.png",
+        "teamId": "4789",
+        "teamName": "ساحل عاج"
+      }
+    },
+    "teams": {
+      "209": {
+        "totalRants": 10,
+        "name": "اکوادور",
+        "crest": "https://a.espncdn.com/i/teamlogos/countries/500/ecu.png"
+      },
+      "4789": {
+        "totalRants": 2,
+        "name": "ساحل عاج",
+        "crest": "https://a.espncdn.com/i/teamlogos/countries/500/civ.png"
+      }
+    }
+  }
+}

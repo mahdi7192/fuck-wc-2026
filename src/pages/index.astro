@@ -1,17 +1,45 @@
 ---
-
+import '../styles/global.css';
+import AppShell from '../components/AppShell.jsx';
 ---
 
-<html lang="en">
+<html lang="fa" dir="rtl">
 	<head>
 		<meta charset="utf-8" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
+		
+		<!-- SEO Meta Tags -->
+		<title>استادیوم خشم | تخلیه خشم و نارضایتی بازی‌های زنده جام جهانی ۲۰۲۶</title>
+		<meta name="description" content="در جریان بازی‌های زنده جام جهانی خشم و کلافگی خود را از بازی ضعیف بازیکنان خالی کنید و به اعصاب‌خردکن‌ترین بازیکن مسابقه رای دهید." />
+		<meta name="robots" content="index, follow" />
+		
+		<!-- Telegram WebApp SDK -->
+		<script src="https://telegram.org/js/telegram-web-app.js" defer></script>
 	</head>
 	<body>
-		<h1>Astro</h1>
+		<main class="app-container" id="main-app-shell">
+			<!-- AppShell Island React Component -->
+			<AppShell client:only="react" />
+		</main>
+
+		<!-- Initialize Telegram WebApp Styling and Event Hooks -->
+		<script is:inline>
+			document.addEventListener('DOMContentLoaded', () => {
+				if (window.Telegram && window.Telegram.WebApp) {
+					const webapp = window.Telegram.WebApp;
+					
+					// Expand the Web App to full height
+					webapp.expand();
+					
+					// Inform Telegram the app is ready
+					webapp.ready();
+
+					// Telegram ready hook
+				}
+			});
+		</script>
 	</body>
 </html>

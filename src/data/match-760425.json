@@ -1,0 +1,27 @@
+{
+  "timestamp": 1781463281443,
+  "match": {
+    "id": "760425",
+    "utcDate": "2026-06-14T20:00Z",
+    "status": "WAITING",
+    "elapsed": 0,
+    "homeTeam": {
+      "id": "449",
+      "name": "Netherlands",
+      "crest": "https://a.espncdn.com/i/teamlogos/countries/500/ned.png",
+      "lineup": [],
+      "bench": []
+    },
+    "awayTeam": {
+      "id": "627",
+      "name": "Japan",
+      "crest": "https://a.espncdn.com/i/teamlogos/countries/500/jpn.png",
+      "lineup": [],
+      "bench": []
+    },
+    "score": {
+      "home": 0,
+      "away": 0
+    }
+  }
+}
