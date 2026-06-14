@@ -26,9 +26,25 @@ const fetchPlayerPhoto = async (playerName) => {
 
   const cacheKey = `player_photo_${cleanName.replace(/\s+/g, "_")}`;
   try {
-    const cached = localStorage.getItem(cacheKey);
-    if (cached) {
-      return cached === "null" ? null : cached;
+    const cachedStr = localStorage.getItem(cacheKey);
+    if (cachedStr) {
+      if (cachedStr === "null") return null;
+      try {
+        const cached = JSON.parse(cachedStr);
+        if (cached && typeof cached === "object" && "timestamp" in cached) {
+          const age = Date.now() - cached.timestamp;
+          const fiveDays = 5 * 24 * 60 * 60 * 1000;
+          if (age < fiveDays) {
+            return cached.value === "null" || cached.value === null ? null : cached.value;
+          }
+        } else {
+          // If it successfully parsed but isn't our schema, fallback to treating it as old cache format
+          return cachedStr;
+        }
+      } catch (err) {
+        // If parsing fails (old cache format), treat it as a valid photo URL cache
+        return cachedStr;
+      }
     }
   } catch (e) {
     // ignore localStorage access errors
@@ -45,13 +61,19 @@ const fetchPlayerPhoto = async (playerName) => {
       const photoUrl = playerInfo.strCutout || playerInfo.strThumb || null;
       if (photoUrl) {
         try {
-          localStorage.setItem(cacheKey, photoUrl);
+          localStorage.setItem(
+            cacheKey,
+            JSON.stringify({ value: photoUrl, timestamp: Date.now() }),
+          );
         } catch (e) {}
         return photoUrl;
       }
     }
     try {
-      localStorage.setItem(cacheKey, "null");
+      localStorage.setItem(
+        cacheKey,
+        JSON.stringify({ value: null, timestamp: Date.now() }),
+      );
     } catch (e) {}
     return null;
   } catch (error) {
