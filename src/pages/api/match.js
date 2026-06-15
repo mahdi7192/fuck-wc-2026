@@ -35,7 +35,7 @@ const parseDisplayClockToMinutes = (displayClock) => {
   if (!displayClock) return 0;
   const clockStr = displayClock.toString().trim();
   
-  if (/HT|Half/i.test(clockStr)) {
+  if (/^(HT|Halftime|Half-Time|Half Time)$/i.test(clockStr)) {
     return 45;
   }
   
@@ -178,8 +178,8 @@ export async function GET({ request }) {
       const statusDesc = competition.status?.type?.description || '';
       if (
         statusName === 'STATUS_HALFTIME' || 
-        /HT|Half/i.test(statusDetail) || 
-        /HT|Half/i.test(statusDesc)
+        /^(HT|Halftime|Half-Time|Half Time)$/i.test(statusDetail) || 
+        /^(HT|Halftime|Half-Time|Half Time)$/i.test(statusDesc)
       ) {
         displayClock = 'HT';
       }
@@ -289,8 +289,8 @@ export async function GET({ request }) {
         const statusDesc = event.status?.type?.description || '';
         if (
           statusName === 'STATUS_HALFTIME' || 
-          /HT|Half/i.test(statusDetail) || 
-          /HT|Half/i.test(statusDesc)
+          /^(HT|Halftime|Half-Time|Half Time)$/i.test(statusDetail) || 
+          /^(HT|Halftime|Half-Time|Half Time)$/i.test(statusDesc)
         ) {
           displayClock = 'HT';
         }
