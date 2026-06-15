@@ -232,12 +232,19 @@ const selectStarting11 = (squad) => {
   return lineup;
 };
 
-export default function MatchZone({ matchId, onBack }) {
+export default function MatchZone({ matchId, onBack, userProfile }) {
   const [authToken, setAuthToken] = useState(
     import.meta.env.PUBLIC_FOOTBALL_API_TOKEN ||
       "ef19c292505a42a8acb1fe4c95ef98f3",
   );
   const [matchStatus, setMatchStatus] = useState("WAITING"); // WAITING, LIVE, FINISHED
+
+  // New States for profile, tabs, predictions & rain
+  const [matchTab, setMatchTab] = useState('lineup'); // 'lineup' | 'history'
+  const [rantHistory, setRantHistory] = useState([]);
+  const [userPrediction, setUserPrediction] = useState(null);
+  const [rainElements, setRainElements] = useState([]);
+  const lastRainTime = useRef(0);
 
   // Teams State
   const [homeTeam, setHomeTeam] = useState({
@@ -270,6 +277,66 @@ export default function MatchZone({ matchId, onBack }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState(null);
   const [lightboxPhoto, setLightboxPhoto] = useState(null);
+
+  const getCookie = (name) => {
+    if (typeof document === "undefined") return null;
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(";").shift();
+    return null;
+  };
+
+  useEffect(() => {
+    const cookieUserId = getCookie("rage_user_id");
+    if (cookieUserId && matchId) {
+      fetch(`/api/prediction?userId=${cookieUserId}&matchId=${matchId}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.playerId) {
+            setUserPrediction(data.playerId);
+          }
+        })
+        .catch(err => console.error("Failed to fetch user prediction:", err));
+    }
+  }, [matchId]);
+
+  const handlePredict = async (playerId) => {
+    const cookieUserId = getCookie("rage_user_id");
+    if (!cookieUserId) return;
+    try {
+      const res = await fetch("/api/prediction", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: cookieUserId, matchId, playerId })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setUserPrediction(playerId);
+        setToastMessage("پیش‌بینی بنجل مسابقه ثبت شد!");
+      }
+    } catch (e) {
+      console.error("Failed to save prediction:", e);
+    }
+  };
+
+  const triggerEmojiRain = () => {
+    const now = Date.now();
+    if (now - lastRainTime.current < 30000) return; // 30s global cooldown
+    lastRainTime.current = now;
+
+    const newRain = Array.from({ length: 30 }).map((_, i) => ({
+      id: now + i + Math.random(),
+      char: Math.random() > 0.5 ? '💩' : '🍅',
+      left: `${Math.random() * 100}vw`,
+      delay: `${Math.random() * 2}s`,
+      duration: `${2 + Math.random() * 3}s`,
+      scale: 0.5 + Math.random() * 1.5
+    }));
+    setRainElements(newRain);
+    setTimeout(() => {
+      setRainElements([]);
+    }, 6000);
+  };
 
   // Calculate the player with the highest totalRants in the match
   const allPlayers = [
@@ -680,7 +747,7 @@ export default function MatchZone({ matchId, onBack }) {
   useEffect(() => {
     if (!matchId || matchStatus !== "LIVE") return;
 
-    let lastTimestamp = Date.now();
+    let lastTimestamp = 0;
     let isMounted = true;
 
     console.log(`[Client] Starting live updates polling for match: ${matchId}`);
@@ -696,6 +763,24 @@ export default function MatchZone({ matchId, onBack }) {
         if (!isMounted) return;
 
         if (data.newRants && data.newRants.length > 0) {
+          // Check for spikes (10+ rants for a player in the new batch)
+          const counts = {};
+          data.newRants.forEach(r => {
+            counts[r.playerId] = (counts[r.playerId] || 0) + 1;
+          });
+          const hasSpike = Object.values(counts).some(c => c >= 10);
+          if (hasSpike && lastTimestamp > 0) {
+            triggerEmojiRain();
+          }
+
+          // Update rant history feed
+          setRantHistory(prev => {
+            const existingIds = new Set(prev.map(r => r.id));
+            const filteredNew = data.newRants.filter(r => !existingIds.has(r.id));
+            const combined = [...filteredNew, ...prev];
+            return combined.slice(0, 100);
+          });
+
           // Keep a set of processed player IDs to clear their activeRants after 2 seconds
           const playersToClear = new Set();
 
@@ -1154,15 +1239,6 @@ export default function MatchZone({ matchId, onBack }) {
       );
     }, 2000);
 
-    // Inline cookie reader
-    const getCookie = (name) => {
-      if (typeof document === "undefined") return null;
-      const value = `; ${document.cookie}`;
-      const parts = value.split(`; ${name}=`);
-      if (parts.length === 2) return parts.pop().split(";").shift();
-      return null;
-    };
-
     // Submit the rant to the backend persistent store
     fetch("/api/match", {
       method: "POST",
@@ -1179,6 +1255,8 @@ export default function MatchZone({ matchId, onBack }) {
         teamCrest,
         rantKey,
         userId: getCookie("rage_user_id"),
+        userName: userProfile?.name || 'تماشاگر ناشناس',
+        userAvatar: userProfile?.avatar || ''
       }),
     })
       .then((res) => res.json())
@@ -1244,7 +1322,7 @@ export default function MatchZone({ matchId, onBack }) {
         key={player.id}
         onClick={
           isWaiting
-            ? undefined
+            ? () => handlePredict(player.id)
             : () => {
                 setSelectedPlayer(player);
                 setIsModalOpen(true);
@@ -1256,8 +1334,8 @@ export default function MatchZone({ matchId, onBack }) {
             player.subbedIn === null && player.minutesPlayed === 0 ? 0.65 : 1,
           borderRight: isHome ? `3px solid ${posColor}` : undefined,
           borderLeft: !isHome ? `3px solid ${posColor}` : undefined,
-          cursor: isWaiting ? "default" : "pointer",
-          pointerEvents: isWaiting ? "none" : "auto",
+          cursor: "pointer",
+          pointerEvents: "auto",
         }}
       >
         <div className="player-row-right">
@@ -1344,6 +1422,25 @@ export default function MatchZone({ matchId, onBack }) {
               >
                 ({player.totalRants})
               </span>
+              {isWaiting && (
+                <span 
+                  className={`predict-badge-inline ${userPrediction === player.id ? 'predicted' : ''}`}
+                  style={{
+                    fontSize: '0.65rem',
+                    padding: '1px 5px',
+                    borderRadius: '4px',
+                    backgroundColor: userPrediction === player.id ? 'var(--color-danger)' : 'rgba(255,255,255,0.06)',
+                    color: '#fff',
+                    marginRight: '6px',
+                    fontWeight: '700',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '2px'
+                  }}
+                >
+                  💩 {userPrediction === player.id ? 'پیش‌بینی شما' : 'بنجل؟'}
+                </span>
+              )}
             </span>
             <span
               className={`active-rant-bubble ${player.activeRant ? "active" : ""}`}
@@ -1432,6 +1529,22 @@ export default function MatchZone({ matchId, onBack }) {
 
   return (
     <div className="match-zone-container">
+      {/* Falling Emoji Rain */}
+      {rainElements.map(emoji => (
+        <span 
+          key={emoji.id}
+          className="falling-emoji-rain"
+          style={{
+            left: emoji.left,
+            animationDelay: emoji.delay,
+            animationDuration: emoji.duration,
+            transform: `scale(${emoji.scale})` 
+          }}
+        >
+          {emoji.char}
+        </span>
+      ))}
+
       {/* Floating Micro-Animations */}
       {floatingBalls.map((ball) => (
         <span
@@ -1503,18 +1616,82 @@ export default function MatchZone({ matchId, onBack }) {
           </div>
         </div>
 
-        {/* Side-by-side Columns */}
-        <div className="native-roster-columns">
-          {/* Right Column: Home Team */}
-          <div className="native-roster-column">
-            {renderTeamRoster(homePlayers, homeBench)}
+        {/* Tab Selector inside MatchZone */}
+        {matchStatus !== "WAITING" && (
+          <div className="match-zone-tabs">
+            <button 
+              className={`match-zone-tab-btn ${matchTab === 'lineup' ? 'active' : ''}`}
+              onClick={() => setMatchTab('lineup')}
+            >
+              📋 ترکیب تیم‌ها
+            </button>
+            <button 
+              className={`match-zone-tab-btn ${matchTab === 'history' ? 'active' : ''}`}
+              onClick={() => setMatchTab('history')}
+            >
+              💬 دیوار خشم زنده
+            </button>
           </div>
+        )}
 
-          {/* Left Column: Away Team */}
-          <div className="native-roster-column">
-            {renderTeamRoster(awayPlayers, awayBench)}
+        {/* Conditional Tab Rendering */}
+        {matchTab === 'lineup' || matchStatus === "WAITING" ? (
+          <div className="native-roster-columns">
+            {/* Right Column: Home Team */}
+            <div className="native-roster-column">
+              {renderTeamRoster(homePlayers, homeBench)}
+            </div>
+
+            {/* Left Column: Away Team */}
+            <div className="native-roster-column">
+              {renderTeamRoster(awayPlayers, awayBench)}
+            </div>
           </div>
-        </div>
+        ) : (
+          <div className="rant-history-feed-container">
+            {rantHistory.length > 0 ? (
+              <div className="rant-history-list">
+                {rantHistory.map((rant) => {
+                  const defaultEmojis = ['⚽', '🏆', '💩', '🤡', '👑', '🏃‍♂️', '🧤', '🍔', '🍺', '🦖'];
+                  const isEmoji = rant.userAvatar && defaultEmojis.includes(rant.userAvatar);
+                  const rantText = PREDEFINED_RANTS.find(r => r.key === rant.rantKey)?.persianText || rant.rantKey;
+                  
+                  return (
+                    <div key={rant.id} className="rant-feed-item">
+                      <div className="rant-feed-avatar-wrapper">
+                        {!rant.userAvatar ? (
+                          <div className="rant-feed-avatar initials">{rant.userName ? rant.userName.trim().charAt(0) : '👤'}</div>
+                        ) : isEmoji ? (
+                          <div className="rant-feed-avatar emoji">{rant.userAvatar}</div>
+                        ) : (
+                          <img src={rant.userAvatar} alt="User" className="rant-feed-avatar" onError={(e) => {
+                            e.target.onerror = null;
+                            e.target.src = 'https://api.dicebear.com/7.x/avataaars/svg?seed=placeholder';
+                          }} />
+                        )}
+                      </div>
+                      <div className="rant-feed-content">
+                        <div className="rant-feed-meta">
+                          <span className="rant-feed-username">{rant.userName}</span>
+                          <span className="rant-feed-time">{new Date(rant.timestamp).toLocaleTimeString('fa-IR', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</span>
+                        </div>
+                        <div className="rant-feed-body">
+                          به <strong style={{ color: 'var(--color-danger)' }}>{rant.playerName}</strong> غر زد: «<span className="rant-feed-text">{rantText}</span>»
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="rant-history-empty">
+                <span>💬</span>
+                <p>هنوز هیچ فحش یا غری برای این بازی ثبت نشده است.</p>
+                {matchStatus === "LIVE" && <p className="blink-soft">اولین نفر باشید که تخلیه خشم می‌کند!</p>}
+              </div>
+            )}
+          </div>
+        )}
       </>
 
       {/* Rant Bottom Sheet Modal */}

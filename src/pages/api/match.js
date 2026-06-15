@@ -350,7 +350,7 @@ export async function GET({ request }) {
 export async function POST({ request }) {
   try {
     const body = await request.json();
-    const { matchId, playerId, playerName, playerPhoto, teamId, teamName, teamCrest, rantKey, userId } = body;
+    const { matchId, playerId, playerName, playerPhoto, teamId, teamName, teamCrest, rantKey, userId, userName, userAvatar } = body;
     
     if (!matchId || !playerId || !rantKey) {
       return new Response(JSON.stringify({ error: "Missing parameters" }), {
@@ -368,7 +368,9 @@ export async function POST({ request }) {
       teamName,
       teamCrest,
       rantKey,
-      userId
+      userId,
+      userName,
+      userAvatar
     });
 
     logDebug(`Rant registered in DB for player ${playerId} in match ${matchId} (key: ${rantKey}, user: ${userId})`);

@@ -2,9 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { getPersianTeamName, renderCrest, getTeamFlag } from '../utils/helpers';
 
 export default function Leaderboard() {
-  const [activeTab, setActiveTab] = useState('players'); // 'players' | 'teams'
+  const [activeTab, setActiveTab] = useState('players'); // 'players' | 'teams' | 'users'
   const [players, setPlayers] = useState([]);
   const [teams, setTeams] = useState([]);
+  const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -19,6 +20,7 @@ export default function Leaderboard() {
       const data = await res.json();
       setPlayers(data.players || []);
       setTeams(data.teams || []);
+      setUsers(data.users || []);
     } catch (err) {
       console.error(err);
       setError(err.message || 'مشکلی در ارتباط با سرور پیش آمده است');
@@ -114,6 +116,12 @@ export default function Leaderboard() {
         >
           🛡️ گه ترین تیم‌ها
         </button>
+        <button
+          onClick={() => setActiveTab('users')}
+          className={`leaderboard-tab-btn ${activeTab === 'users' ? 'active' : ''}`}
+        >
+          🔥 سلاطین خشم
+        </button>
       </div>
 
       {/* Leaderboard Lists */}
@@ -164,7 +172,7 @@ export default function Leaderboard() {
               <p>هنوز هیچ فحشی برای بازیکنی ثبت نشده است!</p>
             </div>
           )
-        ) : (
+        ) : activeTab === 'teams' ? (
           teams.length > 0 ? (
             <div className="leaderboard-list">
               {teams.map((team, index) => {
@@ -201,8 +209,67 @@ export default function Leaderboard() {
               <p>هنوز هیچ فحشی برای تیمی ثبت نشده است!</p>
             </div>
           )
+        ) : (
+          /* activeTab === 'users' */
+          users.length > 0 ? (
+            <div className="leaderboard-list">
+              {users.map((user, index) => {
+                const maxUserRants = users.length > 0 ? users[0].totalRants : 0;
+                const percentage = maxUserRants > 0 ? (user.totalRants / maxUserRants) * 100 : 0;
+                
+                const defaultEmojis = ['⚽', '🏆', '💩', '🤡', '👑', '🏃‍♂️', '🧤', '🍔', '🍺', '🦖'];
+                const isEmoji = user.avatar && defaultEmojis.includes(user.avatar);
+                
+                return (
+                  <div key={user.id} className="leaderboard-item">
+                    <div className="leaderboard-item-meta">
+                      <span className={`leaderboard-rank ${getRankBadgeClass(index)}`}>
+                        {getRankEmojiOrText(index)}
+                      </span>
+                      <div className="leaderboard-avatar-wrapper">
+                        {!user.avatar ? (
+                          <div className="leaderboard-item-avatar initials">{user.name ? user.name.trim().charAt(0) : '👤'}</div>
+                        ) : isEmoji ? (
+                          <div className="leaderboard-item-avatar emoji">{user.avatar}</div>
+                        ) : (
+                          <img
+                            src={user.avatar}
+                            alt={user.name}
+                            className="leaderboard-item-avatar"
+                            onError={(e) => {
+                              e.target.onerror = null;
+                              e.target.src = 'https://api.dicebear.com/7.x/avataaars/svg?seed=placeholder';
+                            }}
+                          />
+                        )}
+                      </div>
+                      <div className="leaderboard-item-details">
+                        <span className="leaderboard-item-name">{user.name}</span>
+                        <span className="leaderboard-item-subtext">رتبه خشمگین: #{index + 1}</span>
+                      </div>
+                    </div>
+                    <div className="leaderboard-item-stats">
+                      <span className="leaderboard-item-score">{user.totalRants} فحش</span>
+                      <div className="leaderboard-progress-track">
+                        <div
+                          className="leaderboard-progress-fill"
+                          style={{ width: `${percentage}%` }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="leaderboard-empty">
+              <span>🕊️</span>
+              <p>هنوز هیچ تماشاگری فحش ثبت نکرده است!</p>
+            </div>
+          )
         )}
       </div>
     </div>
+  );
   );
 }

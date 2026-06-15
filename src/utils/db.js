@@ -116,7 +116,7 @@ async function saveDb() {
   // For RAM mode, it's already updated in memory since it's a reference
 }
 
-export async function addRant({ matchId, playerId, playerName, playerPhoto, teamId, teamName, teamCrest, rantKey, userId }) {
+export async function addRant({ matchId, playerId, playerName, playerPhoto, teamId, teamName, teamCrest, rantKey, userId, userName, userAvatar }) {
   const db = await getDb();
 
   // 1. Update Match-specific rants
@@ -184,11 +184,30 @@ export async function addRant({ matchId, playerId, playerName, playerPhoto, team
   db.recentRants[matchId].push({
     id: `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
     playerId,
+    playerName: playerName || '',
     rantKey,
+    userId,
+    userName: userName || 'تماشاگر ناشناس',
+    userAvatar: userAvatar || '',
     timestamp: Date.now()
   });
   if (db.recentRants[matchId].length > 50) {
     db.recentRants[matchId] = db.recentRants[matchId].slice(-50);
+  }
+
+  // 3.7. Update global user totals
+  if (userId) {
+    if (!db.userTotals) db.userTotals = {};
+    if (!db.userTotals[userId]) {
+      db.userTotals[userId] = {
+        totalRants: 0,
+        name: userName || 'تماشاگر ناشناس',
+        avatar: userAvatar || ''
+      };
+    }
+    db.userTotals[userId].totalRants += 1;
+    if (userName) db.userTotals[userId].name = userName;
+    if (userAvatar) db.userTotals[userId].avatar = userAvatar;
   }
 
   // 4. Save to persistent storage
@@ -197,4 +216,70 @@ export async function addRant({ matchId, playerId, playerName, playerPhoto, team
   globalThis.lastRedisFetchTime = Date.now();
 
   return playerMatchData;
+}
+
+export async function getUserProfile(userId) {
+  if (hasRedis && redisClient) {
+    try {
+      const data = await redisClient.get(`user_profile:${userId}`);
+      if (data) return JSON.parse(data);
+    } catch (e) {
+      console.error("Failed to get user profile from Redis:", e);
+    }
+  }
+  if (!globalThis.userProfiles) globalThis.userProfiles = {};
+  return globalThis.userProfiles[userId] || null;
+}
+
+export async function setUserProfile(userId, profile) {
+  if (hasRedis && redisClient) {
+    try {
+      if (profile === null) {
+        await redisClient.del(`user_profile:${userId}`);
+      } else {
+        await redisClient.set(`user_profile:${userId}`, JSON.stringify(profile));
+      }
+    } catch (e) {
+      console.error("Failed to set user profile in Redis:", e);
+    }
+  }
+  if (!globalThis.userProfiles) globalThis.userProfiles = {};
+  if (profile === null) {
+    delete globalThis.userProfiles[userId];
+  } else {
+    globalThis.userProfiles[userId] = profile;
+  }
+}
+
+export async function getPrediction(userId, matchId) {
+  if (hasRedis && redisClient) {
+    try {
+      const p = await redisClient.get(`user_pred:${userId}:${matchId}`);
+      if (p) return p;
+    } catch (e) {
+      console.error("Failed to get prediction from Redis:", e);
+    }
+  }
+  if (!globalThis.userPredictions) globalThis.userPredictions = {};
+  return globalThis.userPredictions[`${userId}:${matchId}`] || null;
+}
+
+export async function setPrediction(userId, matchId, playerId) {
+  if (hasRedis && redisClient) {
+    try {
+      if (playerId === null) {
+        await redisClient.del(`user_pred:${userId}:${matchId}`);
+      } else {
+        await redisClient.set(`user_pred:${userId}:${matchId}`, playerId);
+      }
+    } catch (e) {
+      console.error("Failed to set prediction in Redis:", e);
+    }
+  }
+  if (!globalThis.userPredictions) globalThis.userPredictions = {};
+  if (playerId === null) {
+    delete globalThis.userPredictions[`${userId}:${matchId}`];
+  } else {
+    globalThis.userPredictions[`${userId}:${matchId}`] = playerId;
+  }
 }

@@ -17,7 +17,13 @@ export async function GET() {
       .sort((a, b) => b.totalRants - a.totalRants)
       .slice(0, 10);
 
-    return new Response(JSON.stringify({ players: topPlayers, teams: topTeams }), {
+    // Convert user totals object to sorted array of top 10
+    const topUsers = Object.entries(db.userTotals || {})
+      .map(([id, data]) => ({ id, ...data }))
+      .sort((a, b) => b.totalRants - a.totalRants)
+      .slice(0, 10);
+
+    return new Response(JSON.stringify({ players: topPlayers, teams: topTeams, users: topUsers }), {
       status: 200,
       headers: {
         'Content-Type': 'application/json'
