@@ -4,6 +4,97 @@ import { getDb, addRant } from '../../utils/db.js';
 // Initialize global variables to store cache in RAM
 globalThis.matchCache = globalThis.matchCache || { matches: null, details: {} };
 
+const SIMULATED_MATCH_ID = "simulated-match";
+
+const getSimulatedMatchState = () => {
+  const now = Date.now();
+  const cycleMs = 100 * 60 * 1000; // 100-minute cycle: 45 min first half, 10 min HT, 45 min second half
+  const cycleTime = now % cycleMs;
+  
+  let elapsedMin = Math.floor(cycleTime / 60000);
+  let displayClock = "";
+  let status = "LIVE";
+  let score = { home: 0, away: 0 };
+  
+  if (elapsedMin < 45) {
+    // First Half (0 - 44 mins)
+    displayClock = String(elapsedMin + 1);
+    if (elapsedMin >= 16) score.home = 1; // Havertz 16'
+    if (elapsedMin >= 36) score.away = 1; // Locadia 36'
+  } else if (elapsedMin >= 45 && elapsedMin < 55) {
+    // Halftime (10 mins)
+    displayClock = "HT";
+    elapsedMin = 45;
+    score = { home: 1, away: 1 };
+  } else if (elapsedMin >= 55 && elapsedMin < 100) {
+    // Second Half (45 - 89 mins of actual game time)
+    const actualGameMin = elapsedMin - 10; // offset the halftime delay
+    displayClock = String(actualGameMin + 1);
+    score.home = 1;
+    score.away = 1;
+    if (actualGameMin >= 52) score.home = 2; // Musiala 52'
+    if (actualGameMin >= 72) score.home = 3; // Undav 72'
+    if (actualGameMin >= 86) score.away = 2; // Locadia 86'
+    elapsedMin = actualGameMin;
+  }
+  
+  return {
+    elapsed: elapsedMin,
+    displayClock,
+    status,
+    score
+  };
+};
+
+const SIMULATED_HOME_TEAM = {
+  id: "germany",
+  name: "Germany",
+  crest: "https://a.espncdn.com/i/teamlogos/soccer/500/381.png",
+  lineup: [
+    { id: "128174", name: "Marc-André ter Stegen", position: "GOALKEEPER", shirtNumber: 1, photoUrl: "https://a.espncdn.com/i/headshots/soccer/players/full/128174.png" },
+    { id: "158588", name: "Antonio Rüdiger", position: "DEFENDER", shirtNumber: 2, photoUrl: "https://a.espncdn.com/i/headshots/soccer/players/full/158588.png" },
+    { id: "210257", name: "Jonathan Tah", position: "DEFENDER", shirtNumber: 4, photoUrl: "https://a.espncdn.com/i/headshots/soccer/players/full/210257.png" },
+    { id: "298495", name: "David Raum", position: "DEFENDER", shirtNumber: 3, photoUrl: "https://a.espncdn.com/i/headshots/soccer/players/full/298495.png" },
+    { id: "240673", name: "Joshua Kimmich", position: "DEFENDER", shirtNumber: 6, photoUrl: "https://a.espncdn.com/i/headshots/soccer/players/full/240673.png" },
+    { id: "151368", name: "Pascal Groß", position: "MIDFIELDER", shirtNumber: 5, photoUrl: "https://a.espncdn.com/i/headshots/soccer/players/full/151368.png" },
+    { id: "242207", name: "Robert Andrich", position: "MIDFIELDER", shirtNumber: 8, photoUrl: "https://a.espncdn.com/i/headshots/soccer/players/full/242207.png" },
+    { id: "257321", name: "Felix Nmecha", position: "MIDFIELDER", shirtNumber: 16, photoUrl: "https://a.espncdn.com/i/headshots/soccer/players/full/257321.png" },
+    { id: "296716", name: "Jamal Musiala", position: "MIDFIELDER", shirtNumber: 10, photoUrl: "https://a.espncdn.com/i/headshots/soccer/players/full/296716.png" },
+    { id: "279288", name: "Kai Havertz", position: "FORWARD", shirtNumber: 7, photoUrl: "https://a.espncdn.com/i/headshots/soccer/players/full/279288.png" },
+    { id: "304388", name: "Florian Wirtz", position: "FORWARD", shirtNumber: 17, photoUrl: "https://a.espncdn.com/i/headshots/soccer/players/full/304388.png" }
+  ],
+  bench: [
+    { id: "305541", name: "Deniz Undav", position: "FORWARD", shirtNumber: 20, photoUrl: "https://a.espncdn.com/i/headshots/soccer/players/full/305541.png" },
+    { id: "203403", name: "Leroy Sané", position: "FORWARD", shirtNumber: 19, photoUrl: "https://a.espncdn.com/i/headshots/soccer/players/full/203403.png" },
+    { id: "201198", name: "Niclas Füllkrug", position: "FORWARD", shirtNumber: 9, photoUrl: "https://a.espncdn.com/i/headshots/soccer/players/full/201198.png" },
+    { id: "286829", name: "Nico Schlotterbeck", position: "DEFENDER", shirtNumber: 15, photoUrl: "https://a.espncdn.com/i/headshots/soccer/players/full/286829.png" }
+  ]
+};
+
+const SIMULATED_AWAY_TEAM = {
+  id: "curacao",
+  name: "Curaçao",
+  crest: "https://a.espncdn.com/i/teamlogos/soccer/500/6900.png",
+  lineup: [
+    { id: "147983", name: "Eloy Room", position: "GOALKEEPER", shirtNumber: 1, photoUrl: "https://a.espncdn.com/i/headshots/soccer/players/full/147983.png" },
+    { id: "160759", name: "Cuco Martina", position: "DEFENDER", shirtNumber: 2, photoUrl: "https://a.espncdn.com/i/headshots/soccer/players/full/160759.png" },
+    { id: "221590", name: "Jurich Carolina", position: "DEFENDER", shirtNumber: 4, photoUrl: "https://a.espncdn.com/i/headshots/soccer/players/full/221590.png" },
+    { id: "220803", name: "Sherel Floranus", position: "DEFENDER", shirtNumber: 3, photoUrl: "https://a.espncdn.com/i/headshots/soccer/players/full/220803.png" },
+    { id: "305719", name: "Roshon van Eijma", position: "DEFENDER", shirtNumber: 5, photoUrl: "https://a.espncdn.com/i/headshots/soccer/players/full/305719.png" },
+    { id: "103597", name: "Vurnon Anita", position: "MIDFIELDER", shirtNumber: 6, photoUrl: "https://a.espncdn.com/i/headshots/soccer/players/full/103597.png" },
+    { id: "132646", name: "Leandro Bacuna", position: "MIDFIELDER", shirtNumber: 7, photoUrl: "https://a.espncdn.com/i/headshots/soccer/players/full/132646.png" },
+    { id: "219503", name: "Juninho Bacuna", position: "MIDFIELDER", shirtNumber: 10, photoUrl: "https://a.espncdn.com/i/headshots/soccer/players/full/219503.png" },
+    { id: "230678", name: "Brandley Kuwas", position: "MIDFIELDER", shirtNumber: 8, photoUrl: "https://a.espncdn.com/i/headshots/soccer/players/full/230678.png" },
+    { id: "172553", name: "Jürgen Locadia", position: "FORWARD", shirtNumber: 9, photoUrl: "https://a.espncdn.com/i/headshots/soccer/players/full/172553.png" },
+    { id: "186835", name: "Rangelo Janga", position: "FORWARD", shirtNumber: 11, photoUrl: "https://a.espncdn.com/i/headshots/soccer/players/full/186835.png" }
+  ],
+  bench: [
+    { id: "200236", name: "Kenji Gorré", position: "FORWARD", shirtNumber: 14, photoUrl: "https://a.espncdn.com/i/headshots/soccer/players/full/200236.png" },
+    { id: "204278", name: "Jafar Arias", position: "FORWARD", shirtNumber: 19, photoUrl: "https://a.espncdn.com/i/headshots/soccer/players/full/204278.png" },
+    { id: "200156", name: "Gervane Kastaneer", position: "FORWARD", shirtNumber: 17, photoUrl: "https://a.espncdn.com/i/headshots/soccer/players/full/200156.png" }
+  ]
+};
+
 
 const logDebug = (msg, obj = '') => {
   // Debug logging disabled
@@ -60,6 +151,9 @@ export async function GET({ request }) {
   const cache = getCache();
   const db = await getDb();
 
+  const simulateToggle = (typeof import.meta !== 'undefined' && import.meta.env?.PUBLIC_SIMULATE_MATCH === 'true') ||
+                         (typeof process !== 'undefined' && process.env?.PUBLIC_SIMULATE_MATCH === 'true');
+
   logDebug(`Incoming request URL: ${request.url}`);
   logDebug(`Parsed matchId: ${matchId}`);
 
@@ -95,6 +189,25 @@ export async function GET({ request }) {
         }
       };
     };
+
+    if (matchId === SIMULATED_MATCH_ID) {
+      const simState = getSimulatedMatchState();
+      const formattedMatch = {
+        id: SIMULATED_MATCH_ID,
+        utcDate: new Date().toISOString(),
+        status: simState.status,
+        elapsed: simState.elapsed,
+        displayClock: simState.displayClock,
+        homeTeam: JSON.parse(JSON.stringify(SIMULATED_HOME_TEAM)),
+        awayTeam: JSON.parse(JSON.stringify(SIMULATED_AWAY_TEAM)),
+        score: simState.score
+      };
+      const matchWithRants = mergeRantsForMatch(formattedMatch);
+      return new Response(JSON.stringify(matchWithRants), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
 
     if (cachedDetail && cachedDetail.timestamp && cachedDetail.match) {
       const status = cachedDetail.match.status;
@@ -251,98 +364,126 @@ export async function GET({ request }) {
 
   // Case 2: Fetch list of matches (MatchesList)
   else {
+    let list = [];
+    let isError = false;
+    let errorMsg = "";
+
     const cachedMatches = cache.matches;
     if (cachedMatches && cachedMatches.timestamp && cachedMatches.list) {
       const age = now - cachedMatches.timestamp;
       logDebug(`Cached matches list age: ${Math.round(age / 1000)}s, TTL: 30s`);
       if (age < 30 * 1000) {
         logDebug("Serving matches list from cache.");
-        return new Response(JSON.stringify({ matches: cachedMatches.list, fromCache: true }), {
-          status: 200,
-          headers: { 'Content-Type': 'application/json' }
-        });
+        list = [...cachedMatches.list];
       }
     }
 
-    logDebug("Fetching matches list from ESPN scoreboard...");
-    try {
-      const scoreboardRes = await fetch('https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard');
-      if (!scoreboardRes.ok) {
-        throw new Error(`ESPN Scoreboard returned status ${scoreboardRes.status}`);
-      }
-      const scoreboardData = await scoreboardRes.json();
-      const events = scoreboardData.events || [];
-      logDebug(`Scoreboard events count: ${events.length}`);
-
-      const list = events.map(event => {
-        const competition = event.competitions?.[0];
-        const homeCompetitor = competition?.competitors?.find(c => c.homeAway === 'home');
-        const awayCompetitor = competition?.competitors?.find(c => c.homeAway === 'away');
-        const state = event.status?.type?.state;
-        const isLive = state === 'in';
-        const isFinished = state === 'post';
-        const mappedStatus = isLive ? 'LIVE' : isFinished ? 'FINISHED' : 'WAITING';
-        let displayClock = event.status?.displayClock || '';
-        const statusName = event.status?.type?.name || '';
-        const statusDetail = event.status?.type?.detail || '';
-        const statusDesc = event.status?.type?.description || '';
-        if (
-          statusName === 'STATUS_HALFTIME' || 
-          /^(HT|Halftime|Half-Time|Half Time)$/i.test(statusDetail) || 
-          /^(HT|Halftime|Half-Time|Half Time)$/i.test(statusDesc)
-        ) {
-          displayClock = 'HT';
+    if (list.length === 0) {
+      logDebug("Fetching matches list from ESPN scoreboard...");
+      try {
+        const scoreboardRes = await fetch('https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard');
+        if (!scoreboardRes.ok) {
+          throw new Error(`ESPN Scoreboard returned status ${scoreboardRes.status}`);
         }
-        const elapsed = parseDisplayClockToMinutes(displayClock);
+        const scoreboardData = await scoreboardRes.json();
+        const events = scoreboardData.events || [];
+        logDebug(`Scoreboard events count: ${events.length}`);
 
-        return {
-          id: event.id,
-          utcDate: event.date,
-          status: mappedStatus,
-          elapsed: elapsed,
-          displayClock: displayClock,
-          homeTeam: {
-            name: homeCompetitor?.team?.displayName || homeCompetitor?.team?.name || 'میزبان',
-            crest: homeCompetitor?.team?.logo || homeCompetitor?.team?.logos?.[0]?.href || '',
-          },
-          awayTeam: {
-            name: awayCompetitor?.team?.displayName || awayCompetitor?.team?.name || 'میهمان',
-            crest: awayCompetitor?.team?.logo || awayCompetitor?.team?.logos?.[0]?.href || '',
-          },
-          score: {
-            home: parseInt(homeCompetitor?.score) || 0,
-            away: parseInt(awayCompetitor?.score) || 0
+        list = events.map(event => {
+          const competition = event.competitions?.[0];
+          const homeCompetitor = competition?.competitors?.find(c => c.homeAway === 'home');
+          const awayCompetitor = competition?.competitors?.find(c => c.homeAway === 'away');
+          const state = event.status?.type?.state;
+          const isLive = state === 'in';
+          const isFinished = state === 'post';
+          const mappedStatus = isLive ? 'LIVE' : isFinished ? 'FINISHED' : 'WAITING';
+          let displayClock = event.status?.displayClock || '';
+          const statusName = event.status?.type?.name || '';
+          const statusDetail = event.status?.type?.detail || '';
+          const statusDesc = event.status?.type?.description || '';
+          if (
+            statusName === 'STATUS_HALFTIME' || 
+            /^(HT|Halftime|Half-Time|Half Time)$/i.test(statusDetail) || 
+            /^(HT|Halftime|Half-Time|Half Time)$/i.test(statusDesc)
+          ) {
+            displayClock = 'HT';
           }
-        };
-      });
+          const elapsed = parseDisplayClockToMinutes(displayClock);
 
-      logDebug(`Successfully parsed ${list.length} matches for list.`);
-
-      cache.matches = {
-        timestamp: now,
-        list: list
-      };
-      saveCache(cache);
-
-      return new Response(JSON.stringify({ matches: list }), {
-        status: 200,
-        headers: { 'Content-Type': 'application/json' }
-      });
-
-    } catch (error) {
-      logDebug("Error fetching matches list:", error.message);
-      if (cachedMatches && cachedMatches.list) {
-        logDebug("Serving expired list cache as fallback.");
-        return new Response(JSON.stringify({ matches: cachedMatches.list, fromCacheFallback: true }), {
-          status: 200,
-          headers: { 'Content-Type': 'application/json' }
+          return {
+            id: event.id,
+            utcDate: event.date,
+            status: mappedStatus,
+            elapsed: elapsed,
+            displayClock: displayClock,
+            homeTeam: {
+              name: homeCompetitor?.team?.displayName || homeCompetitor?.team?.name || 'میزبان',
+              crest: homeCompetitor?.team?.logo || homeCompetitor?.team?.logos?.[0]?.href || '',
+            },
+            awayTeam: {
+              name: awayCompetitor?.team?.displayName || awayCompetitor?.team?.name || 'میهمان',
+              crest: awayCompetitor?.team?.logo || awayCompetitor?.team?.logos?.[0]?.href || '',
+            },
+            score: {
+              home: parseInt(homeCompetitor?.score) || 0,
+              away: parseInt(awayCompetitor?.score) || 0
+            }
+          };
         });
+
+        logDebug(`Successfully parsed ${list.length} matches for list.`);
+
+        cache.matches = {
+          timestamp: now,
+          list: list
+        };
+        saveCache(cache);
+
+      } catch (error) {
+        logDebug("Error fetching matches list:", error.message);
+        if (cachedMatches && cachedMatches.list) {
+          logDebug("Serving expired list cache as fallback.");
+          list = [...cachedMatches.list];
+        } else {
+          isError = true;
+          errorMsg = error.message;
+        }
       }
-      return new Response(JSON.stringify({ error: error.message }), {
+    }
+
+    if (simulateToggle) {
+      const simState = getSimulatedMatchState();
+      const simMatch = {
+        id: SIMULATED_MATCH_ID,
+        utcDate: new Date().toISOString(),
+        status: simState.status,
+        elapsed: simState.elapsed,
+        displayClock: simState.displayClock,
+        homeTeam: {
+          name: SIMULATED_HOME_TEAM.name,
+          crest: SIMULATED_HOME_TEAM.crest
+        },
+        awayTeam: {
+          name: SIMULATED_AWAY_TEAM.name,
+          crest: SIMULATED_AWAY_TEAM.crest
+        },
+        score: simState.score
+      };
+      list = [simMatch, ...list.filter(m => m.id !== SIMULATED_MATCH_ID)];
+      isError = false; // Reset error state if simulation is successfully appended
+    }
+
+    if (isError) {
+      return new Response(JSON.stringify({ error: errorMsg }), {
         status: 500,
         headers: { 'Content-Type': 'application/json' }
       });
     }
+
+    return new Response(JSON.stringify({ matches: list }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' }
+    });
   }
 }
 
