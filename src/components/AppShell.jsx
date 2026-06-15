@@ -182,11 +182,6 @@ export default function AppShell() {
           </button>
         </nav>
       )}
-
-      {/* Native App Footer */}
-      <footer className="native-app-footer" style={{ paddingBottom: !activeMatchId ? '100px' : '24px' }}>
-        <p>© ۲۰۲۶ استادیوم خشم فوتبالی • تلگرام مینی‌اپ</p>
-      </footer>
     </div>
   );
 }

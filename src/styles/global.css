@@ -295,7 +295,7 @@ body {
 
 .native-upcoming-time {
   color: var(--text-primary);
-  font-family: var(--font-en);
+  font-family: var(--font-fa);
   font-weight: 700;
   font-size: 0.8rem;
 }
@@ -971,16 +971,7 @@ dialog.md3-bottom-sheet[open] .sheet-container {
   background-color: #d32f2f;
 }
 
-/* Footer layout */
-.native-app-footer {
-  margin-top: auto;
-  padding: 24px 16px;
-  text-align: center;
-  font-size: 0.7rem;
-  color: var(--text-hint);
-  border-top: 1px solid var(--border-color);
-  background-color: var(--color-surface);
-}
+
 
 /* Animations */
 .animate-fade-in {
@@ -1113,6 +1104,7 @@ dialog.md3-bottom-sheet[open] .sheet-container {
   flex: 1;
   height: 100%;
   transition: all 0.2s ease;
+  font-family: inherit;
 }
 
 .native-nav-item:active {
@@ -1409,7 +1401,7 @@ dialog.md3-bottom-sheet[open] .sheet-container {
   font-size: 1rem;
   animation: pulse 1.5s infinite;
   display: inline-block;
-  filter: drop-shadow(0 0 3px #ffd700) drop-shadow(0 0 1px rgba(255, 215, 0, 0.9));
+  filter: drop-shadow(0 0 3px #ffffff) drop-shadow(0 0 1px rgba(255, 255, 255, 0.9));
   margin-right: 4px;
 }
 

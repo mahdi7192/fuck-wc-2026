@@ -172,7 +172,17 @@ export async function GET({ request }) {
       const isFinished = state === 'post';
       const mappedStatus = isLive ? 'LIVE' : isFinished ? 'FINISHED' : 'WAITING';
 
-      const displayClock = competition.status?.displayClock || '';
+      let displayClock = competition.status?.displayClock || '';
+      const statusName = competition.status?.type?.name || '';
+      const statusDetail = competition.status?.type?.detail || '';
+      const statusDesc = competition.status?.type?.description || '';
+      if (
+        statusName === 'STATUS_HALFTIME' || 
+        /HT|Half/i.test(statusDetail) || 
+        /HT|Half/i.test(statusDesc)
+      ) {
+        displayClock = 'HT';
+      }
       const elapsed = parseDisplayClockToMinutes(displayClock);
 
       const formattedMatch = {
@@ -273,7 +283,17 @@ export async function GET({ request }) {
         const isLive = state === 'in';
         const isFinished = state === 'post';
         const mappedStatus = isLive ? 'LIVE' : isFinished ? 'FINISHED' : 'WAITING';
-        const displayClock = event.status?.displayClock || '';
+        let displayClock = event.status?.displayClock || '';
+        const statusName = event.status?.type?.name || '';
+        const statusDetail = event.status?.type?.detail || '';
+        const statusDesc = event.status?.type?.description || '';
+        if (
+          statusName === 'STATUS_HALFTIME' || 
+          /HT|Half/i.test(statusDetail) || 
+          /HT|Half/i.test(statusDesc)
+        ) {
+          displayClock = 'HT';
+        }
         const elapsed = parseDisplayClockToMinutes(displayClock);
 
         return {

@@ -86,69 +86,96 @@ export default function RantDialog({
       onClick={handleDialogClick}
       onCancel={handleCancel}
     >
-      <div className="sheet-container">
+      <div className="sheet-container" style={{ gap: '14px', padding: '8px 16px 20px 16px' }}>
         {/* Drag handle */}
         <div className="sheet-drag-handle"></div>
 
-        <div 
-          className={`native-player-row ${player.side === 'home' ? 'home-row' : 'away-row'}`}
-          style={{ 
-            cursor: 'default', 
-            borderBottom: '1px solid var(--border-color)', 
-            paddingBottom: '12px', 
-            width: '100%',
-            boxSizing: 'border-box'
-          }}
-        >
-          <div className="player-row-right">
-            <div className="native-player-avatar-container">
-              <img
-                src={player.photoUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(player.name)}&backgroundColor=${player.side === 'home' ? '00e676' : 'ff3e3e'}`}
-                alt={player.name}
-                className="native-player-avatar"
-              />
-              <span className="native-player-number-chip">{player.shirtNumber}</span>
-            </div>
-            <div className="native-player-name-wrapper">
-              <span className="native-player-name">
-                {player.name}
-              </span>
-              <span 
-                className="native-player-rants-count"
-                style={{ color: player.totalRants > 0 ? 'var(--color-danger)' : 'var(--text-hint)' }}
-              >
-                {player.totalRants} فحش
-              </span>
-            </div>
+        <div className="sheet-header-centered" style={{ position: 'relative', width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', paddingBottom: '10px', borderBottom: '1px solid var(--border-color)', boxSizing: 'border-box' }}>
+          {/* Close button at the top corner */}
+          <button
+            onClick={onClose}
+            aria-label="بستن"
+            className="native-dialog-close-btn"
+            style={{ position: 'absolute', top: 0, right: 0 }}
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+
+          {/* Large Avatar container */}
+          <div className="large-avatar-container" style={{ position: 'relative', width: '72px', height: '72px', marginBottom: '10px', marginTop: '2px' }}>
+            <img
+              src={player.photoUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(player.name)}&backgroundColor=${player.side === 'home' ? '00e676' : 'ff3e3e'}`}
+              alt={player.name}
+              style={{
+                width: '100%',
+                height: '100%',
+                borderRadius: '50%',
+                backgroundColor: 'rgba(255, 255, 255, 0.04)',
+                border: '2px solid var(--border-color-active)',
+                objectFit: 'cover',
+                display: 'block',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.3)'
+              }}
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(player.name)}&backgroundColor=${player.side === 'home' ? '00e676' : 'ff3e3e'}`;
+              }}
+            />
+            <span 
+              className="native-player-number-chip"
+              style={{
+                position: 'absolute',
+                bottom: '-6px',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                backgroundColor: 'var(--color-surface-hover)',
+                color: 'var(--text-primary)',
+                border: '1.5px solid var(--border-color-active)',
+                fontFamily: 'var(--font-family-en)',
+                fontSize: '0.75rem',
+                fontWeight: '700',
+                padding: '2px 6px',
+                borderRadius: '8px',
+                minWidth: '20px',
+                textAlign: 'center',
+                boxShadow: '0 2px 4px rgba(0,0,0,0.5)',
+                lineHeight: 1
+              }}
+            >
+              {player.shirtNumber}
+            </span>
           </div>
 
-          <div className="player-row-left">
-            <button
-              onClick={onClose}
-              aria-label="بستن"
-              className="native-dialog-close-btn"
-            >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <line x1="18" y1="6" x2="6" y2="18"></line>
-                <line x1="6" y1="6" x2="18" y2="18"></line>
-              </svg>
-            </button>
+          {/* Centered Name and Info */}
+          <h2 style={{ fontSize: '1.1rem', fontWeight: '800', color: 'var(--text-primary)', margin: '2px 0', textAlign: 'center' }}>
+            {player.name}
+          </h2>
+
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'center', fontSize: '0.8rem', color: 'var(--text-hint)', marginTop: '2px' }}>
+            <span>{posLabel}</span>
+            <span style={{ color: 'var(--border-color-active)' }}>•</span>
+            <span style={{ color: player.totalRants > 0 ? 'var(--color-danger)' : 'var(--text-hint)', fontWeight: '700' }}>
+              {player.totalRants} فحش ثبت‌شده
+            </span>
           </div>
         </div>
 
         {/* Section 1: Curses Analytics (Top 10) at the Top */}
-        <div className="native-dialog-section">
-          <h3 className="native-dialog-section-title">
+        <div className="native-dialog-section" style={{ paddingBottom: '10px' }}>
+          <h3 className="native-dialog-section-title" style={{ marginBottom: '6px' }}>
             آمار فحش‌های ثبت‌شده ({totalRants} بار)
           </h3>
           
-          <div className="native-analytics-list">
+          <div className="native-analytics-list" style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: '110px', overflowY: 'auto', paddingRight: '4px' }}>
             {sortedRantsForAnalytics.map((rant) => {
               const count = rant.count;
               const percent = totalRants > 0 ? Math.round((count / totalRants) * 100) : 0;
               
               return (
-                <div key={rant.key} className="native-analytics-row">
+                <div key={rant.key} className="native-analytics-row" style={{ minWidth: 0 }}>
                   <div className="native-analytics-labels">
                     <span className="native-analytics-rant-name">{rant.persianText}</span>
                     <span className="native-analytics-rant-value">
