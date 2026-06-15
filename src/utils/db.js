@@ -25,13 +25,17 @@ export async function initDb() {
       const data = await redisClient.get('rants_db');
       if (data) {
         cachedDb = JSON.parse(data);
+        if (!cachedDb.recentRants) {
+          cachedDb.recentRants = {};
+        }
       } else {
         cachedDb = {
           rants: {},
           totals: {
             players: {},
             teams: {},
-          }
+          },
+          recentRants: {}
         };
         await redisClient.set('rants_db', JSON.stringify(cachedDb));
       }
@@ -43,7 +47,8 @@ export async function initDb() {
           totals: {
             players: {},
             teams: {},
-          }
+          },
+          recentRants: {}
         };
       }
     }
@@ -55,8 +60,11 @@ export async function initDb() {
         totals: {
           players: {},
           teams: {},
-        }
+        },
+        recentRants: {}
       };
+    } else if (!cachedDb.recentRants) {
+      cachedDb.recentRants = {};
     }
   }
   return cachedDb;
@@ -68,6 +76,9 @@ export async function getDb() {
       const data = await redisClient.get('rants_db');
       if (data) {
         cachedDb = JSON.parse(data);
+        if (!cachedDb.recentRants) {
+          cachedDb.recentRants = {};
+        }
         return cachedDb;
       }
     } catch (error) {
@@ -77,6 +88,8 @@ export async function getDb() {
   
   if (!cachedDb) {
     await initDb();
+  } else if (!cachedDb.recentRants) {
+    cachedDb.recentRants = {};
   }
   return cachedDb;
 }
@@ -148,6 +161,23 @@ export async function addRant({ matchId, playerId, playerName, playerPhoto, team
     db.totals.teams[teamId].totalRants += 1;
     if (teamName) db.totals.teams[teamId].name = teamName;
     if (teamCrest) db.totals.teams[teamId].crest = teamCrest;
+  }
+
+  // 3.5. Update recent rants log
+  if (!db.recentRants) {
+    db.recentRants = {};
+  }
+  if (!db.recentRants[matchId]) {
+    db.recentRants[matchId] = [];
+  }
+  db.recentRants[matchId].push({
+    id: `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+    playerId,
+    rantKey,
+    timestamp: Date.now()
+  });
+  if (db.recentRants[matchId].length > 50) {
+    db.recentRants[matchId] = db.recentRants[matchId].slice(-50);
   }
 
   // 4. Save to persistent storage

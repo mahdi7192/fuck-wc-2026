@@ -659,62 +659,73 @@ export default function MatchZone({ matchId, onBack }) {
     }
   }, [authToken, matchId]);
 
-  // Live SSE sync for real-time player rants updates
+  // Live polling sync for real-time player rants updates
   useEffect(() => {
     if (!matchId) return;
 
-    console.log(`[Client] Opening SSE live stream for match: ${matchId}`);
-    const eventSource = new EventSource(`/api/live?matchId=${matchId}`);
+    let lastTimestamp = Date.now();
+    let isMounted = true;
 
-    eventSource.onmessage = (event) => {
+    console.log(`[Client] Starting live updates polling for match: ${matchId}`);
+
+    const pollLiveUpdates = async () => {
       try {
-        if (event.data === "connected") {
-          console.log("[Client] SSE live connection established.");
-          return;
-        }
+        const res = await fetch(`/api/live?matchId=${matchId}&since=${lastTimestamp}`);
+        if (!res.ok) throw new Error(`Status ${res.status}`);
+        const data = await res.json();
+        if (!isMounted) return;
 
-        const data = JSON.parse(event.data);
-        if (data.matchId === matchId) {
-          const { playerId, totalRants, rants, rantKey } = data;
-          console.log(
-            `[Client] SSE update received for player ${playerId}: ${totalRants} rants (key: ${rantKey})`,
-          );
+        if (data.newRants && data.newRants.length > 0) {
+          // Keep a set of processed player IDs to clear their activeRants after 2 seconds
+          const playersToClear = new Set();
 
-          // Resolve Persian text of the rant
-          const rantPersian =
-            PREDEFINED_RANTS.find((r) => r.key === rantKey)?.persianText || "";
+          data.newRants.forEach((newRant) => {
+            const { playerId, rantKey } = newRant;
+            const playerStats = data.rants?.[playerId];
+            if (!playerStats) return;
 
-          const updateRants = (prevList) => {
-            return prevList.map((p) => {
-              if (p.id === playerId) {
-                const updated = {
-                  ...p,
-                  totalRants,
-                  rants,
-                  activeRant: rantPersian,
-                };
-                if (p.baseRating) {
-                  updated.rating = Math.max(
-                    1.0,
-                    parseFloat((p.baseRating - totalRants * 0.2).toFixed(1)),
-                  );
-                }
-                return updated;
-              }
-              return p;
-            });
-          };
+            const totalRants = playerStats.totalRants || 0;
+            const rants = playerStats.rants || {};
 
-          setHomePlayers(updateRants);
-          setAwayPlayers(updateRants);
-          setHomeBench(updateRants);
-          setAwayBench(updateRants);
+            // Resolve Persian text of the rant
+            const rantPersian =
+              PREDEFINED_RANTS.find((r) => r.key === rantKey)?.persianText || "";
 
-          // Clear temporary active rant after 2 seconds to keep UI clean
-          setTimeout(() => {
-            const clearRant = (prevList) => {
+            const updateRants = (prevList) => {
               return prevList.map((p) => {
                 if (p.id === playerId) {
+                  const updated = {
+                    ...p,
+                    totalRants,
+                    rants,
+                    activeRant: rantPersian,
+                  };
+                  if (p.baseRating) {
+                    updated.rating = Math.max(
+                      1.0,
+                      parseFloat((p.baseRating - totalRants * 0.2).toFixed(1)),
+                    );
+                  }
+                  return updated;
+                }
+                return p;
+              });
+            };
+
+            setHomePlayers(updateRants);
+            setAwayPlayers(updateRants);
+            setHomeBench(updateRants);
+            setAwayBench(updateRants);
+
+            playersToClear.add(playerId);
+          });
+
+          // After 2 seconds, clear the activeRants for the players that had updates
+          setTimeout(() => {
+            if (!isMounted) return;
+            const clearRant = (prevList) => {
+              return prevList.map((p) => {
+                if (playersToClear.has(p.id)) {
                   return { ...p, activeRant: null };
                 }
                 return p;
@@ -726,18 +737,24 @@ export default function MatchZone({ matchId, onBack }) {
             setAwayBench(clearRant);
           }, 2000);
         }
+
+        if (data.timestamp) {
+          lastTimestamp = data.timestamp;
+        }
       } catch (err) {
-        console.error("[Client] Failed to parse SSE event data:", err);
+        console.error("[Client] Failed to poll live updates:", err);
       }
     };
 
-    eventSource.onerror = (err) => {
-      console.error("[Client] SSE error:", err);
-    };
+    // Poll every 3 seconds
+    const interval = setInterval(pollLiveUpdates, 3000);
+
+    // Initial fetch to establish lastTimestamp
+    pollLiveUpdates();
 
     return () => {
-      console.log(`[Client] Closing SSE connection for match: ${matchId}`);
-      eventSource.close();
+      isMounted = false;
+      clearInterval(interval);
     };
   }, [matchId]);
 

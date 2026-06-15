@@ -1,6 +1,5 @@
 export const prerender = false;
 import { getDb, addRant } from '../../utils/db.js';
-import { broadcastToMatch } from './live.js';
 
 // Initialize global variables to store cache in RAM
 globalThis.matchCache = globalThis.matchCache || { matches: null, details: {} };
@@ -373,20 +372,6 @@ export async function POST({ request }) {
     });
 
     logDebug(`Rant registered in DB for player ${playerId} in match ${matchId} (key: ${rantKey}, user: ${userId})`);
-
-    // Broadcast the update to all live connected clients watching this match
-    try {
-      broadcastToMatch(matchId, {
-        matchId,
-        playerId,
-        rantKey,
-        totalRants: playerRants.totalRants,
-        rants: playerRants.rants
-      });
-      logDebug(`Successfully broadcasted live update to match ${matchId} for player ${playerId}`);
-    } catch (broadcastErr) {
-      logDebug(`Failed to broadcast: ${broadcastErr.message}`);
-    }
 
     return new Response(JSON.stringify({ success: true, playerRants }), {
       status: 200,
