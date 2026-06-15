@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getPersianTeamName, renderCrest } from '../utils/helpers';
+import { getPersianTeamName, renderCrest, getTeamFlag } from '../utils/helpers';
 
 export default function Leaderboard() {
   const [activeTab, setActiveTab] = useState('players'); // 'players' | 'teams'
@@ -176,7 +176,7 @@ export default function Leaderboard() {
                         {getRankEmojiOrText(index)}
                       </span>
                       <div className="leaderboard-crest-wrapper">
-                        {renderCrest(team.crest || '🇮🇷', team.name, 'leaderboard-item-crest')}
+                        {renderCrest(team.crest || getTeamFlag(team.name), team.name, 'leaderboard-item-crest')}
                       </div>
                       <div className="leaderboard-item-details">
                         <span className="leaderboard-item-name">{getPersianTeamName(team.name)}</span>

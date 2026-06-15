@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getPersianTeamName, formatMatchTime, formatMatchDate, renderCrest } from '../utils/helpers';
+import { getPersianTeamName, formatMatchTime, formatMatchDate, renderCrest, getTeamFlag } from '../utils/helpers';
 
 export default function MatchesList({ onSelectMatch }) {
   const [matches, setMatches] = useState([]);
@@ -75,7 +75,7 @@ export default function MatchesList({ onSelectMatch }) {
       >
         {/* Right side: Home Team (RTL right-to-left layout) */}
         <div className="native-match-team home">
-          {renderCrest(match.homeTeam.crest || '🇮🇷', match.homeTeam.name, 'native-team-logo')}
+          {renderCrest(match.homeTeam.crest || getTeamFlag(match.homeTeam.name), match.homeTeam.name, 'native-team-logo')}
           <span className="native-team-name">{getPersianTeamName(match.homeTeam.name)}</span>
         </div>
 
@@ -113,7 +113,7 @@ export default function MatchesList({ onSelectMatch }) {
         {/* Left side: Away Team */}
         <div className="native-match-team away">
           <span className="native-team-name">{getPersianTeamName(match.awayTeam.name)}</span>
-          {renderCrest(match.awayTeam.crest || '🇵🇹', match.awayTeam.name, 'native-team-logo')}
+          {renderCrest(match.awayTeam.crest || getTeamFlag(match.awayTeam.name), match.awayTeam.name, 'native-team-logo')}
         </div>
       </div>
     );

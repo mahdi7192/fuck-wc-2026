@@ -58,6 +58,65 @@ export const getPersianTeamName = (name) => {
   return TEAM_NAMES_FA[name] || name;
 };
 
+// Map team names (English and Persian) to flag emojis, fallback to a neutral soccer ball
+export const getTeamFlag = (name) => {
+  if (!name) return '⚽';
+  const cleanName = name.trim();
+  const flagMap = {
+    'Germany': '🇩🇪', 'آلمان': '🇩🇪',
+    'Curaçao': '🇨🇼', 'کوراسائو': '🇨🇼',
+    'Haiti': '🇭🇹', 'هائیتی': '🇭🇹',
+    'Scotland': '🏴󠁧󠁢󠁳󠁣󠁴󠁿', 'اسکاتلند': '🏴󠁧󠁢󠁳󠁣󠁴󠁿',
+    'Australia': '🇦🇺', 'استرالیا': '🇦🇺',
+    'Turkey': '🇹🇷', 'ترکیه': '🇹🇷',
+    'Türkiye': '🇹🇷',
+    'Netherlands': '🇳🇱', 'هلند': '🇳🇱',
+    'Japan': '🇯🇵', 'ژاپن': '🇯🇵',
+    'Ivory Coast': '🇨🇮', 'ساحل عاج': '🇨🇮',
+    'Ecuador': '🇪🇨', 'اکوادور': '🇪🇨',
+    'Iran': '🇮🇷', 'ایران': '🇮🇷',
+    'Portugal': '🇵🇹', 'پرتغال': '🇵🇹',
+    'Spain': '🇪🇸', 'اسپانیا': '🇪🇸',
+    'Argentina': '🇦🇷', 'آرژانتین': '🇦🇷',
+    'Brazil': '🇧🇷', 'برزیل': '🇧🇷',
+    'France': '🇫🇷', 'فرانسه': '🇫🇷',
+    'England': '🏴󠁧󠁢󠁥󠁮󠁧󠁿', 'انگلستان': '🏴󠁧󠁢󠁥󠁮󠁧󠁿',
+    'Italy': '🇮🇹', 'ایتالیا': '🇮🇹',
+    'Belgium': '🇧🇪', 'بلژیک': '🇧🇪',
+    'Croatia': '🇭🇷', 'کرواسی': '🇭🇷',
+    'Uruguay': '🇺🇾', 'اروگوئه': '🇺🇾',
+    'Colombia': '🇨🇴', 'کلمبیا': '🇨🇴',
+    'Morocco': '🇲🇦', 'مراکش': '🇲🇦',
+    'Senegal': '🇸🇳', 'سنگال': '🇸🇳',
+    'USA': '🇺🇸', 'آمریکا': '🇺🇸',
+    'United States': '🇺🇸',
+    'Mexico': '🇲🇽', 'مکزیک': '🇲🇽',
+    'Canada': '🇨🇦', 'کانادا': '🇨🇦',
+    'Saudi Arabia': '🇸🇦', 'عربستان سعودی': '🇸🇦',
+    'South Korea': '🇰🇷', 'کره جنوبی': '🇰🇷',
+    'Qatar': '🇶🇦', 'قطر': '🇶🇦',
+    'Switzerland': '🇨🇭', 'سوئیس': '🇨🇭',
+    'Denmark': '🇩🇰', 'دانمارک': '🇩🇰',
+    'Tunisia': '🇹🇳', 'تونس': '🇹🇳',
+    'Poland': '🇵🇱', 'لهستان': '🇵🇱',
+    'Wales': '🏴󠁧󠁢󠁷󠁬󠁳󠁿', 'ولز': '🏴󠁧󠁢󠁷󠁬󠁳󠁿',
+    'Ghana': '🇬🇭', 'غنا': '🇬🇭',
+    'Cameroon': '🇨🇲', 'کامرون': '🇨🇲',
+    'Serbia': '🇷🇸', 'صربستان': '🇷🇸',
+    'Costa Rica': '🇨🇷', 'کاستاریکا': '🇨🇷',
+    'Peru': '🇵🇪', 'پرو': '🇵🇪',
+    'Ukraine': '🇺🇦', 'اوکراین': '🇺🇦',
+    'Sweden': '🇸🇪', 'سوئد': '🇸🇪',
+    'Austria': '🇦🇹', 'اتریش': '🇦🇹',
+    'Egypt': '🇪🇬', 'مصر': '🇪🇬',
+    'Algeria': '🇩🇿', 'الجزایر': '🇩🇿',
+    'Nigeria': '🇳🇬', 'نیجریه': '🇳🇬',
+    'Chile': '🇨🇱', 'شیلی': '🇨🇱',
+    'Paraguay': '🇵🇾', 'پاراگوئه': '🇵🇾'
+  };
+  return flagMap[cleanName] || '⚽';
+};
+
 // Formatting helpers for match time & date
 export const formatMatchTime = (utcDateString) => {
   try {

@@ -5,6 +5,7 @@ import {
   formatMatchTime,
   formatMatchDate,
   renderCrest,
+  getTeamFlag,
 } from "../utils/helpers";
 
 // Helper to normalize player names for searching on TheSportsDB
@@ -1459,7 +1460,7 @@ export default function MatchZone({ matchId, onBack }) {
             {/* Home Team */}
             <div className="native-scoreboard-team home">
               {renderCrest(
-                homeTeam.crest || "🇮🇷",
+                homeTeam.crest || getTeamFlag(homeTeam.name),
                 homeTeam.name,
                 "native-scoreboard-crest",
               )}
@@ -1481,7 +1482,7 @@ export default function MatchZone({ matchId, onBack }) {
                 {awayTeam.name}
               </span>
               {renderCrest(
-                awayTeam.crest || "🇵🇹",
+                awayTeam.crest || getTeamFlag(awayTeam.name),
                 awayTeam.name,
                 "native-scoreboard-crest",
               )}
