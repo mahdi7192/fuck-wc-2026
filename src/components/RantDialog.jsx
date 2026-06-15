@@ -12,7 +12,8 @@ export default function RantDialog({
   awayTeam,
   matchScore,
   matchMinutes,
-  matchStatus
+  matchStatus,
+  onShowLightbox
 }) {
   const dialogRef = useRef(null);
 
@@ -86,11 +87,11 @@ export default function RantDialog({
       onClick={handleDialogClick}
       onCancel={handleCancel}
     >
-      <div className="sheet-container" style={{ gap: '14px', padding: '8px 16px 20px 16px' }}>
+      <div className="sheet-container" style={{ gap: '14px', padding: '8px 16px 20px 16px', maxHeight: '90vh', overflowY: 'hidden', display: 'flex', flexDirection: 'column' }}>
         {/* Drag handle */}
         <div className="sheet-drag-handle"></div>
 
-        <div className="sheet-header-centered" style={{ position: 'relative', width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', paddingBottom: '10px', borderBottom: '1px solid var(--border-color)', boxSizing: 'border-box' }}>
+        <div className="sheet-header-centered" style={{ position: 'relative', width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', paddingBottom: '10px', borderBottom: '1px solid var(--border-color)', boxSizing: 'border-box', flexShrink: 0 }}>
           {/* Close button at the top corner */}
           <button
             onClick={onClose}
@@ -105,7 +106,24 @@ export default function RantDialog({
           </button>
 
           {/* Large Avatar container */}
-          <div className="large-avatar-container" style={{ position: 'relative', width: '72px', height: '72px', marginBottom: '10px', marginTop: '2px' }}>
+          <div 
+            className="large-avatar-container" 
+            onClick={() => {
+              const photoUrl = player.photoUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(player.name)}&backgroundColor=${player.side === 'home' ? '00e676' : 'ff3e3e'}`;
+              onShowLightbox?.(photoUrl, player.name);
+            }}
+            style={{ 
+              position: 'relative', 
+              width: '96px', 
+              height: '96px', 
+              marginBottom: '10px', 
+              marginTop: '2px',
+              cursor: 'pointer',
+              transition: 'transform 0.2s ease-in-out'
+            }}
+            onMouseEnter={(e) => { e.currentTarget.style.transform = 'scale(1.05)'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.transform = 'scale(1)'; }}
+          >
             <img
               src={player.photoUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(player.name)}&backgroundColor=${player.side === 'home' ? '00e676' : 'ff3e3e'}`}
               alt={player.name}
@@ -164,12 +182,12 @@ export default function RantDialog({
         </div>
 
         {/* Section 1: Curses Analytics (Top 10) at the Top */}
-        <div className="native-dialog-section" style={{ paddingBottom: '10px' }}>
+        <div className="native-dialog-section" style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', paddingBottom: '10px' }}>
           <h3 className="native-dialog-section-title" style={{ marginBottom: '6px' }}>
             آمار فحش‌های ثبت‌شده ({totalRants} بار)
           </h3>
           
-          <div className="native-analytics-list" style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: '110px', overflowY: 'auto', paddingRight: '4px' }}>
+          <div className="native-analytics-list" style={{ display: 'flex', flexDirection: 'column', gap: '8px', flex: 1, overflowY: 'auto', paddingRight: '4px' }}>
             {sortedRantsForAnalytics.map((rant) => {
               const count = rant.count;
               const percent = totalRants > 0 ? Math.round((count / totalRants) * 100) : 0;
@@ -193,7 +211,7 @@ export default function RantDialog({
 
         {/* Section 2: Cursing Action Chips in 3 Horizontal Rows at the Bottom */}
         {matchStatus === 'LIVE' && (
-          <div className="native-dialog-section" style={{ borderBottom: 'none', paddingBottom: 0 }}>
+          <div className="native-dialog-section" style={{ borderBottom: 'none', paddingBottom: 0, flexShrink: 0 }}>
             <h3 className="native-dialog-section-title">
               ثبت فحش (تخلیه خشم)
             </h3>

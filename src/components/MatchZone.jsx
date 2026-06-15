@@ -268,6 +268,7 @@ export default function MatchZone({ matchId, onBack }) {
   const [selectedPlayer, setSelectedPlayer] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState(null);
+  const [lightboxPhoto, setLightboxPhoto] = useState(null);
 
   // Calculate the player with the highest totalRants in the match
   const allPlayers = [
@@ -1241,7 +1242,15 @@ export default function MatchZone({ matchId, onBack }) {
         }}
       >
         <div className="player-row-right">
-          <div className="native-player-avatar-container">
+          <div 
+            className="native-player-avatar-container"
+            style={{ cursor: "pointer" }}
+            onClick={(e) => {
+              e.stopPropagation();
+              const photoUrl = player.photoUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(player.name)}&backgroundColor=${isHome ? "00e676" : "ff3e3e"}`;
+              setLightboxPhoto({ url: photoUrl, name: player.name });
+            }}
+          >
             <img
               src={
                 player.photoUrl ||
@@ -1475,6 +1484,7 @@ export default function MatchZone({ matchId, onBack }) {
         matchScore={matchScore}
         matchMinutes={matchMinutes}
         matchStatus={matchStatus}
+        onShowLightbox={(photoUrl, name) => setLightboxPhoto({ url: photoUrl, name })}
       />
 
       {/* Toast Notification */}
@@ -1482,6 +1492,56 @@ export default function MatchZone({ matchId, onBack }) {
         <div className="native-toast">
           <span className="native-toast-icon">✅</span>
           <span className="native-toast-message">{toastMessage}</span>
+        </div>
+      )}
+
+      {/* Lightbox photo preview */}
+      {lightboxPhoto && (
+        <div
+          className="lightbox-overlay animate-fade-in"
+          onClick={() => setLightboxPhoto(null)}
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "rgba(0, 0, 0, 0.85)",
+            backdropFilter: "blur(10px)",
+            WebkitBackdropFilter: "blur(10px)",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 15000,
+            cursor: "zoom-out",
+          }}
+        >
+          <img
+            src={lightboxPhoto.url}
+            alt={lightboxPhoto.name}
+            style={{
+              maxWidth: "85%",
+              maxHeight: "75%",
+              objectFit: "contain",
+              borderRadius: "16px",
+              boxShadow: "0 12px 40px rgba(0, 0, 0, 0.8)",
+              border: "1px solid rgba(255, 255, 255, 0.15)",
+              animation: "scaleUp 0.25s cubic-bezier(0.1, 0.8, 0.3, 1) forwards",
+            }}
+            onClick={(e) => e.stopPropagation()}
+          />
+          <span
+            style={{
+              marginTop: "16px",
+              color: "#ffffff",
+              fontSize: "1.05rem",
+              fontWeight: "800",
+              textShadow: "0 2px 8px rgba(0,0,0,0.8)",
+            }}
+          >
+            {lightboxPhoto.name}
+          </span>
         </div>
       )}
     </div>
