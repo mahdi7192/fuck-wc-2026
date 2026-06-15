@@ -60,10 +60,17 @@ export default function AppShell() {
       if (!valid) return; // Stop if not in Telegram context
 
       // 2. Resolve User ID
-      let id = getCookie('rage_user_id');
-      if (!id) {
-        id = 'usr_' + Math.random().toString(36).substring(2, 15) + Date.now().toString(36);
+      const tgUser = window.Telegram?.WebApp?.initDataUnsafe?.user;
+      let id = null;
+      if (tgUser && tgUser.id) {
+        id = `tg_${tgUser.id}`;
         setCookie('rage_user_id', id, 365);
+      } else {
+        id = getCookie('rage_user_id');
+        if (!id) {
+          id = 'usr_' + Math.random().toString(36).substring(2, 15) + Date.now().toString(36);
+          setCookie('rage_user_id', id, 365);
+        }
       }
       setUserId(id);
 
@@ -333,7 +340,7 @@ export default function AppShell() {
       <main className="native-main-content" style={{ display: 'flex', flexDirection: 'column', flex: 1, width: '100%', paddingBottom: !activeMatchId ? '80px' : '0' }}>
         {activeMatchId ? (
           <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', flex: 1, width: '100%' }}>
-            <MatchZone matchId={activeMatchId} onBack={handleBack} userProfile={userProfile} />
+            <MatchZone matchId={activeMatchId} onBack={handleBack} userProfile={userProfile} userId={userId} />
           </div>
         ) : activeTab === 'matches' ? (
           <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', flex: 1, width: '100%' }}>

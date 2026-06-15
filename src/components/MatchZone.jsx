@@ -232,7 +232,7 @@ const selectStarting11 = (squad) => {
   return lineup;
 };
 
-export default function MatchZone({ matchId, onBack, userProfile }) {
+export default function MatchZone({ matchId, onBack, userProfile, userId }) {
   const [authToken, setAuthToken] = useState(
     import.meta.env.PUBLIC_FOOTBALL_API_TOKEN ||
       "ef19c292505a42a8acb1fe4c95ef98f3",
@@ -245,12 +245,7 @@ export default function MatchZone({ matchId, onBack, userProfile }) {
   const [userPrediction, setUserPrediction] = useState(null);
   const [rainElements, setRainElements] = useState([]);
   const lastRainTime = useRef(0);
-  const [currentUserId, setCurrentUserId] = useState(null);
   const [chatInput, setChatInput] = useState("");
-
-  useEffect(() => {
-    setCurrentUserId(getCookie("rage_user_id"));
-  }, []);
 
   // Teams State
   const [homeTeam, setHomeTeam] = useState({
@@ -293,9 +288,8 @@ export default function MatchZone({ matchId, onBack, userProfile }) {
   };
 
   useEffect(() => {
-    const cookieUserId = getCookie("rage_user_id");
-    if (cookieUserId && matchId) {
-      fetch(`/api/prediction?userId=${cookieUserId}&matchId=${matchId}`)
+    if (userId && matchId) {
+      fetch(`/api/prediction?userId=${userId}&matchId=${matchId}`)
         .then(res => res.json())
         .then(data => {
           if (data.playerId) {
@@ -304,16 +298,15 @@ export default function MatchZone({ matchId, onBack, userProfile }) {
         })
         .catch(err => console.error("Failed to fetch user prediction:", err));
     }
-  }, [matchId]);
+  }, [userId, matchId]);
 
   const handlePredict = async (playerId) => {
-    const cookieUserId = getCookie("rage_user_id");
-    if (!cookieUserId) return;
+    if (!userId) return;
     try {
       const res = await fetch("/api/prediction", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId: cookieUserId, matchId, playerId })
+        body: JSON.stringify({ userId, matchId, playerId })
       });
       const data = await res.json();
       if (data.success) {
@@ -326,19 +319,18 @@ export default function MatchZone({ matchId, onBack, userProfile }) {
   };
 
   const handleSendChatMessage = async () => {
-    if (!chatInput.trim()) return;
+    if (!chatInput.trim() || !userId) return;
 
     const msgText = chatInput.trim();
     setChatInput(""); // snappy UI clear
 
-    const uid = currentUserId || getCookie("rage_user_id");
     const tempId = `temp_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
     const tempMessage = {
       id: tempId,
       playerId: null,
       playerName: "",
       rantKey: msgText,
-      userId: uid,
+      userId,
       userName: userProfile?.name || 'تماشاگر ناشناس',
       userAvatar: userProfile?.avatar || '',
       timestamp: Date.now()
@@ -361,7 +353,7 @@ export default function MatchZone({ matchId, onBack, userProfile }) {
           teamName: "",
           teamCrest: "",
           rantKey: msgText,
-          userId: uid,
+          userId,
           userName: userProfile?.name || 'تماشاگر ناشناس',
           userAvatar: userProfile?.avatar || ''
         }),
@@ -1306,7 +1298,7 @@ export default function MatchZone({ matchId, onBack, userProfile }) {
         teamName,
         teamCrest,
         rantKey,
-        userId: getCookie("rage_user_id"),
+        userId,
         userName: userProfile?.name || 'تماشاگر ناشناس',
         userAvatar: userProfile?.avatar || ''
       }),
@@ -1689,7 +1681,7 @@ export default function MatchZone({ matchId, onBack, userProfile }) {
                   const defaultEmojis = ['⚽', '🏆', '💩', '🤡', '👑', '🏃‍♂️', '🧤', '🍔', '🍺', '🦖'];
                   const isEmoji = rant.userAvatar && defaultEmojis.includes(rant.userAvatar);
                   const rantText = PREDEFINED_RANTS.find(r => r.key === rant.rantKey)?.persianText || rant.rantKey;
-                  const isMyMessage = rant.userId === currentUserId;
+                  const isMyMessage = rant.userId === userId;
                   
                   return (
                     <div key={rant.id} className={`rant-feed-item ${isMyMessage ? 'my-message' : ''}`}>
