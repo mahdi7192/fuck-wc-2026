@@ -17,19 +17,20 @@ if (hasRedis) {
   }
 }
 
-let cachedDb = null;
+globalThis.cachedDb = globalThis.cachedDb || null;
+globalThis.lastRedisFetchTime = globalThis.lastRedisFetchTime || 0;
 
 export async function initDb() {
   if (hasRedis && redisClient) {
     try {
       const data = await redisClient.get('rants_db');
       if (data) {
-        cachedDb = JSON.parse(data);
-        if (!cachedDb.recentRants) {
-          cachedDb.recentRants = {};
+        globalThis.cachedDb = JSON.parse(data);
+        if (!globalThis.cachedDb.recentRants) {
+          globalThis.cachedDb.recentRants = {};
         }
       } else {
-        cachedDb = {
+        globalThis.cachedDb = {
           rants: {},
           totals: {
             players: {},
@@ -37,12 +38,13 @@ export async function initDb() {
           },
           recentRants: {}
         };
-        await redisClient.set('rants_db', JSON.stringify(cachedDb));
+        await redisClient.set('rants_db', JSON.stringify(globalThis.cachedDb));
       }
+      globalThis.lastRedisFetchTime = Date.now();
     } catch (error) {
       console.error("Failed to initialize database from Redis:", error);
-      if (!cachedDb) {
-        cachedDb = {
+      if (!globalThis.cachedDb) {
+        globalThis.cachedDb = {
           rants: {},
           totals: {
             players: {},
@@ -54,8 +56,8 @@ export async function initDb() {
     }
   } else {
     // RAM mode
-    if (!cachedDb) {
-      cachedDb = {
+    if (!globalThis.cachedDb) {
+      globalThis.cachedDb = {
         rants: {},
         totals: {
           players: {},
@@ -63,41 +65,50 @@ export async function initDb() {
         },
         recentRants: {}
       };
-    } else if (!cachedDb.recentRants) {
-      cachedDb.recentRants = {};
+    } else if (!globalThis.cachedDb.recentRants) {
+      globalThis.cachedDb.recentRants = {};
     }
   }
-  return cachedDb;
+  return globalThis.cachedDb;
 }
 
 export async function getDb() {
+  const now = Date.now();
+  const cacheAge = now - (globalThis.lastRedisFetchTime || 0);
+
+  // Use RAM-first cached DB if it's fresh (less than 1 minute old)
+  if (globalThis.cachedDb && cacheAge < 60000) {
+    return globalThis.cachedDb;
+  }
+
   if (hasRedis && redisClient) {
     try {
       const data = await redisClient.get('rants_db');
       if (data) {
-        cachedDb = JSON.parse(data);
-        if (!cachedDb.recentRants) {
-          cachedDb.recentRants = {};
+        globalThis.cachedDb = JSON.parse(data);
+        if (!globalThis.cachedDb.recentRants) {
+          globalThis.cachedDb.recentRants = {};
         }
-        return cachedDb;
+        globalThis.lastRedisFetchTime = now;
+        return globalThis.cachedDb;
       }
     } catch (error) {
       console.error("Failed to get database from Redis:", error);
     }
   }
   
-  if (!cachedDb) {
+  if (!globalThis.cachedDb) {
     await initDb();
-  } else if (!cachedDb.recentRants) {
-    cachedDb.recentRants = {};
+  } else if (!globalThis.cachedDb.recentRants) {
+    globalThis.cachedDb.recentRants = {};
   }
-  return cachedDb;
+  return globalThis.cachedDb;
 }
 
 async function saveDb() {
   if (hasRedis && redisClient) {
     try {
-      await redisClient.set('rants_db', JSON.stringify(cachedDb));
+      await redisClient.set('rants_db', JSON.stringify(globalThis.cachedDb));
     } catch (error) {
       console.error("Failed to save database to Redis:", error);
     }
@@ -181,8 +192,9 @@ export async function addRant({ matchId, playerId, playerName, playerPhoto, team
   }
 
   // 4. Save to persistent storage
-  cachedDb = db;
+  globalThis.cachedDb = db;
   await saveDb();
+  globalThis.lastRedisFetchTime = Date.now();
 
   return playerMatchData;
 }

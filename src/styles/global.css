@@ -725,6 +725,30 @@ dialog.md3-bottom-sheet::backdrop {
   animation: fadeIn 0.25s ease-out forwards;
 }
 
+/* Lightbox Dialog */
+dialog.lightbox-dialog {
+  border: none !important;
+  background: transparent !important;
+  padding: 0;
+  margin: 0;
+  max-width: none;
+  max-height: none;
+  width: 100vw;
+  height: 100vh;
+  outline: none !important;
+  overflow: hidden;
+  position: fixed;
+  top: 0;
+  left: 0;
+}
+
+dialog.lightbox-dialog::backdrop {
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  animation: fadeIn 0.2s ease-out forwards;
+}
+
 dialog.md3-bottom-sheet[open] .sheet-container {
   animation: slideUp 0.28s cubic-bezier(0.1, 0.76, 0.55, 0.94) forwards; /* Slides up from bottom */
 }

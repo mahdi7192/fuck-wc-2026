@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import RantDialog from "./RantDialog";
 import {
   getPersianTeamName,
@@ -291,6 +291,21 @@ export default function MatchZone({ matchId, onBack }) {
       return () => clearTimeout(timer);
     }
   }, [toastMessage]);
+
+  const lightboxRef = useRef(null);
+  useEffect(() => {
+    const dialogEl = lightboxRef.current;
+    if (!dialogEl) return;
+    if (lightboxPhoto) {
+      if (!dialogEl.open) {
+        dialogEl.showModal();
+      }
+    } else {
+      if (dialogEl.open) {
+        dialogEl.close();
+      }
+    }
+  }, [lightboxPhoto]);
 
   // Sync selectedPlayer details if they update in the background (like photoUrl or rants)
   useEffect(() => {
@@ -662,7 +677,7 @@ export default function MatchZone({ matchId, onBack }) {
 
   // Live polling sync for real-time player rants updates
   useEffect(() => {
-    if (!matchId) return;
+    if (!matchId || matchStatus !== "LIVE") return;
 
     let lastTimestamp = Date.now();
     let isMounted = true;
@@ -670,6 +685,9 @@ export default function MatchZone({ matchId, onBack }) {
     console.log(`[Client] Starting live updates polling for match: ${matchId}`);
 
     const pollLiveUpdates = async () => {
+      if (matchStatus !== "LIVE") return;
+      if (typeof document !== "undefined" && document.visibilityState === "hidden") return;
+
       try {
         const res = await fetch(`/api/live?matchId=${matchId}&since=${lastTimestamp}`);
         if (!res.ok) throw new Error(`Status ${res.status}`);
@@ -747,8 +765,8 @@ export default function MatchZone({ matchId, onBack }) {
       }
     };
 
-    // Poll every 3 seconds
-    const interval = setInterval(pollLiveUpdates, 3000);
+    // Poll every 10 seconds
+    const interval = setInterval(pollLiveUpdates, 10000);
 
     // Initial fetch to establish lastTimestamp
     pollLiveUpdates();
@@ -757,7 +775,7 @@ export default function MatchZone({ matchId, onBack }) {
       isMounted = false;
       clearInterval(interval);
     };
-  }, [matchId]);
+  }, [matchId, matchStatus]);
 
   // Update match minutes locally every minute when live
   useEffect(() => {
@@ -1281,6 +1299,36 @@ export default function MatchZone({ matchId, onBack }) {
               style={{ display: "flex", alignItems: "center", gap: "4px" }}
             >
               {lastName}
+              {player.subbedOut && (
+                <span
+                  style={{
+                    fontSize: "0.75rem",
+                    color: "var(--color-danger)",
+                    fontWeight: "800",
+                    lineHeight: 1,
+                    display: "inline-flex",
+                    alignItems: "center",
+                  }}
+                  title="تعویض خارج"
+                >
+                  ↓
+                </span>
+              )}
+              {player.subbedIn && (
+                <span
+                  style={{
+                    fontSize: "0.75rem",
+                    color: "var(--color-primary)",
+                    fontWeight: "800",
+                    lineHeight: 1,
+                    display: "inline-flex",
+                    alignItems: "center",
+                  }}
+                  title="تعویض داخل"
+                >
+                  ↑
+                </span>
+              )}
               <span
                 className="native-player-rants-count-inline"
                 style={{
@@ -1295,11 +1343,6 @@ export default function MatchZone({ matchId, onBack }) {
               >
                 ({player.totalRants})
               </span>
-              {hasMostRants && (
-                <span className="poop-sticker-badge" title="بیشترین فحش مسابقه">
-                  💩
-                </span>
-              )}
             </span>
             <span
               className={`active-rant-bubble ${player.activeRant ? "active" : ""}`}
@@ -1318,14 +1361,19 @@ export default function MatchZone({ matchId, onBack }) {
               ⚽{player.goals > 1 ? `x${player.goals}` : ""}
             </span>
           )}
-          {player.subbedOut && (
-            <span className="player-badge-stat sub-out">
-              ↓ {player.subbedOut}'
-            </span>
-          )}
-          {player.subbedIn && (
-            <span className="player-badge-stat sub-in">
-              ↑ {player.subbedIn}'
+          {hasMostRants && (
+            <span
+              className="poop-sticker-badge"
+              style={{
+                fontSize: "1.4rem",
+                marginRight: 0,
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+              title="بیشترین فحش مسابقه"
+            >
+              💩
             </span>
           )}
         </div>
@@ -1495,55 +1543,59 @@ export default function MatchZone({ matchId, onBack }) {
         </div>
       )}
 
-      {/* Lightbox photo preview */}
-      {lightboxPhoto && (
+      {/* Lightbox photo preview (native dialog top layer overlay) */}
+      <dialog
+        ref={lightboxRef}
+        className="lightbox-dialog"
+        onCancel={(e) => {
+          e.preventDefault();
+          setLightboxPhoto(null);
+        }}
+        onClick={() => setLightboxPhoto(null)}
+      >
         <div
-          className="lightbox-overlay animate-fade-in"
-          onClick={() => setLightboxPhoto(null)}
           style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundColor: "rgba(0, 0, 0, 0.85)",
-            backdropFilter: "blur(10px)",
-            WebkitBackdropFilter: "blur(10px)",
+            width: "100%",
+            height: "100%",
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
             justifyContent: "center",
-            zIndex: 15000,
             cursor: "zoom-out",
+            boxSizing: "border-box",
+            padding: "16px",
           }}
         >
-          <img
-            src={lightboxPhoto.url}
-            alt={lightboxPhoto.name}
-            style={{
-              maxWidth: "85%",
-              maxHeight: "75%",
-              objectFit: "contain",
-              borderRadius: "16px",
-              boxShadow: "0 12px 40px rgba(0, 0, 0, 0.8)",
-              border: "1px solid rgba(255, 255, 255, 0.15)",
-              animation: "scaleUp 0.25s cubic-bezier(0.1, 0.8, 0.3, 1) forwards",
-            }}
-            onClick={(e) => e.stopPropagation()}
-          />
-          <span
-            style={{
-              marginTop: "16px",
-              color: "#ffffff",
-              fontSize: "1.05rem",
-              fontWeight: "800",
-              textShadow: "0 2px 8px rgba(0,0,0,0.8)",
-            }}
-          >
-            {lightboxPhoto.name}
-          </span>
+          {lightboxPhoto && (
+            <>
+              <img
+                src={lightboxPhoto.url}
+                alt={lightboxPhoto.name}
+                style={{
+                  maxWidth: "85%",
+                  maxHeight: "75%",
+                  objectFit: "contain",
+                  borderRadius: "16px",
+                  boxShadow: "0 12px 40px rgba(0, 0, 0, 0.8)",
+                  border: "1px solid rgba(255, 255, 255, 0.15)",
+                }}
+                onClick={(e) => e.stopPropagation()}
+              />
+              <span
+                style={{
+                  marginTop: "16px",
+                  color: "#ffffff",
+                  fontSize: "1.05rem",
+                  fontWeight: "800",
+                  textShadow: "0 2px 8px rgba(0,0,0,0.8)",
+                }}
+              >
+                {lightboxPhoto.name}
+              </span>
+            </>
+          )}
         </div>
-      )}
+      </dialog>
     </div>
   );
 }
