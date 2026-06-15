@@ -336,7 +336,7 @@ export default function MatchZone({ matchId, onBack, userProfile, userId }) {
       timestamp: Date.now()
     };
 
-    setRantHistory(prev => [tempMessage, ...prev]);
+    setRantHistory(prev => [...prev, tempMessage]);
 
     try {
       await fetch("/api/match", {
@@ -405,6 +405,22 @@ export default function MatchZone({ matchId, onBack, userProfile, userId }) {
   }, [toastMessage]);
 
   const lightboxRef = useRef(null);
+  const chatContainerRef = useRef(null);
+
+  const scrollToBottom = () => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+    }
+  };
+
+  useEffect(() => {
+    if (matchTab === 'history') {
+      scrollToBottom();
+      const timeoutId = setTimeout(scrollToBottom, 50);
+      return () => clearTimeout(timeoutId);
+    }
+  }, [matchTab, rantHistory]);
+
   useEffect(() => {
     const dialogEl = lightboxRef.current;
     if (!dialogEl) return;
@@ -821,8 +837,8 @@ export default function MatchZone({ matchId, onBack, userProfile, userId }) {
           setRantHistory(prev => {
             const existingIds = new Set(prev.map(r => r.id));
             const filteredNew = data.newRants.filter(r => !existingIds.has(r.id));
-            const combined = [...filteredNew, ...prev];
-            return combined.slice(0, 100);
+            const combined = [...prev, ...filteredNew];
+            return combined.slice(-100);
           });
 
           // Keep a set of processed player IDs to clear their activeRants after 2 seconds
@@ -1494,75 +1510,7 @@ export default function MatchZone({ matchId, onBack, userProfile, userId }) {
           </div>
         </div>
 
-        <div className="player-row-left" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-          {player.goals > 0 && (
-            <span
-              className="player-badge-stat goals"
-              title={`${player.goals} Goals`}
-            >
-              ⚽{player.goals > 1 ? `x${player.goals}` : ""}
-            </span>
-          )}
-          {player.assists > 0 && (
-            <span
-              className="player-badge-stat assists"
-              style={{
-                backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                border: '1px solid var(--border-color)',
-                fontSize: '0.7rem',
-                fontWeight: '700',
-                padding: '2px 6px',
-                borderRadius: '4px',
-                fontFamily: 'var(--font-en)',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '2px'
-              }}
-              title={`${player.assists} Assists`}
-            >
-              👟{player.assists > 1 ? `x${player.assists}` : ""}
-            </span>
-          )}
-          {player.yellowCards > 0 && (
-            <span
-              className="player-badge-stat yellow-card"
-              style={{
-                fontSize: '0.65rem',
-                padding: '2px 4px',
-                borderRadius: '2px',
-                backgroundColor: '#ffd600',
-                color: '#000',
-                lineHeight: 1,
-                display: 'inline-flex',
-                alignItems: 'center',
-                fontWeight: '900',
-                boxShadow: '0 1px 2px rgba(0,0,0,0.3)'
-              }}
-              title="Yellow Card"
-            >
-              🟨
-            </span>
-          )}
-          {player.redCards > 0 && (
-            <span
-              className="player-badge-stat red-card"
-              style={{
-                fontSize: '0.65rem',
-                padding: '2px 4px',
-                borderRadius: '2px',
-                backgroundColor: '#d50000',
-                color: '#fff',
-                lineHeight: 1,
-                display: 'inline-flex',
-                alignItems: 'center',
-                fontWeight: '900',
-                boxShadow: '0 1px 2px rgba(0,0,0,0.3)'
-              }}
-              title="Red Card"
-            >
-              🟥
-            </span>
-          )}
+        <div className="player-row-left">
           {hasMostRants && (
             <span
               className="poop-sticker-badge"
@@ -1734,7 +1682,7 @@ export default function MatchZone({ matchId, onBack, userProfile, userId }) {
             </div>
           </div>
         ) : (
-          <div className="rant-history-feed-container" style={{ paddingBottom: '130px' }}>
+          <div ref={chatContainerRef} className="rant-history-feed-container" style={{ paddingBottom: '130px' }}>
             {rantHistory.length > 0 ? (
               <div className="rant-history-list">
                 {rantHistory.map((rant) => {
