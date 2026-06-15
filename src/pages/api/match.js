@@ -146,7 +146,8 @@ const parseDisplayClockToMinutes = (displayClock) => {
 };
 
 export async function GET({ request }) {
-  const matchId = request.headers.get('x-match-id');
+  const url = new URL(request.url);
+  const matchId = request.headers.get('x-match-id') || url.searchParams.get('matchId') || url.searchParams.get('match_id');
   const now = Date.now();
   const cache = getCache();
   const db = await getDb();

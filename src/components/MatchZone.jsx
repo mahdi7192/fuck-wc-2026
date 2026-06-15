@@ -1494,13 +1494,73 @@ export default function MatchZone({ matchId, onBack, userProfile, userId }) {
           </div>
         </div>
 
-        <div className="player-row-left">
+        <div className="player-row-left" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
           {player.goals > 0 && (
             <span
               className="player-badge-stat goals"
               title={`${player.goals} Goals`}
             >
               ⚽{player.goals > 1 ? `x${player.goals}` : ""}
+            </span>
+          )}
+          {player.assists > 0 && (
+            <span
+              className="player-badge-stat assists"
+              style={{
+                backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                border: '1px solid var(--border-color)',
+                fontSize: '0.7rem',
+                fontWeight: '700',
+                padding: '2px 6px',
+                borderRadius: '4px',
+                fontFamily: 'var(--font-en)',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '2px'
+              }}
+              title={`${player.assists} Assists`}
+            >
+              👟{player.assists > 1 ? `x${player.assists}` : ""}
+            </span>
+          )}
+          {player.yellowCards > 0 && (
+            <span
+              className="player-badge-stat yellow-card"
+              style={{
+                fontSize: '0.65rem',
+                padding: '2px 4px',
+                borderRadius: '2px',
+                backgroundColor: '#ffd600',
+                color: '#000',
+                lineHeight: 1,
+                display: 'inline-flex',
+                alignItems: 'center',
+                fontWeight: '900',
+                boxShadow: '0 1px 2px rgba(0,0,0,0.3)'
+              }}
+              title="Yellow Card"
+            >
+              🟨
+            </span>
+          )}
+          {player.redCards > 0 && (
+            <span
+              className="player-badge-stat red-card"
+              style={{
+                fontSize: '0.65rem',
+                padding: '2px 4px',
+                borderRadius: '2px',
+                backgroundColor: '#d50000',
+                color: '#fff',
+                lineHeight: 1,
+                display: 'inline-flex',
+                alignItems: 'center',
+                fontWeight: '900',
+                boxShadow: '0 1px 2px rgba(0,0,0,0.3)'
+              }}
+              title="Red Card"
+            >
+              🟥
             </span>
           )}
           {hasMostRants && (
