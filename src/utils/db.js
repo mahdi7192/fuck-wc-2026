@@ -119,59 +119,63 @@ async function saveDb() {
 export async function addRant({ matchId, playerId, playerName, playerPhoto, teamId, teamName, teamCrest, rantKey, userId, userName, userAvatar }) {
   const db = await getDb();
 
+  let playerMatchData = null;
+
   // 1. Update Match-specific rants
-  if (!db.rants[matchId]) {
-    db.rants[matchId] = {};
-  }
-  if (!db.rants[matchId][playerId]) {
-    db.rants[matchId][playerId] = {
-      totalRants: 0,
-      rants: {},
-      playerName: playerName || '',
-      playerPhoto: playerPhoto || '',
-      teamId: teamId || '',
-      teamName: teamName || '',
-      teamCrest: teamCrest || ''
-    };
-  }
-
-  const playerMatchData = db.rants[matchId][playerId];
-  playerMatchData.rants[rantKey] = (playerMatchData.rants[rantKey] || 0) + 1;
-  playerMatchData.totalRants += 1;
-  if (playerName) playerMatchData.playerName = playerName;
-  if (playerPhoto) playerMatchData.playerPhoto = playerPhoto;
-  if (teamId) playerMatchData.teamId = teamId;
-  if (teamName) playerMatchData.teamName = teamName;
-  if (teamCrest) playerMatchData.teamCrest = teamCrest;
-
-  // 2. Update global tournament totals for Player
-  if (!db.totals.players[playerId]) {
-    db.totals.players[playerId] = {
-      totalRants: 0,
-      name: playerName || '',
-      photo: playerPhoto || '',
-      teamId: teamId || '',
-      teamName: teamName || ''
-    };
-  }
-  db.totals.players[playerId].totalRants += 1;
-  if (playerName) db.totals.players[playerId].name = playerName;
-  if (playerPhoto) db.totals.players[playerId].photo = playerPhoto;
-  if (teamId) db.totals.players[playerId].teamId = teamId;
-  if (teamName) db.totals.players[playerId].teamName = teamName;
-
-  // 3. Update global tournament totals for Team
-  if (teamId) {
-    if (!db.totals.teams[teamId]) {
-      db.totals.teams[teamId] = {
+  if (playerId) {
+    if (!db.rants[matchId]) {
+      db.rants[matchId] = {};
+    }
+    if (!db.rants[matchId][playerId]) {
+      db.rants[matchId][playerId] = {
         totalRants: 0,
-        name: teamName || '',
-        crest: teamCrest || ''
+        rants: {},
+        playerName: playerName || '',
+        playerPhoto: playerPhoto || '',
+        teamId: teamId || '',
+        teamName: teamName || '',
+        teamCrest: teamCrest || ''
       };
     }
-    db.totals.teams[teamId].totalRants += 1;
-    if (teamName) db.totals.teams[teamId].name = teamName;
-    if (teamCrest) db.totals.teams[teamId].crest = teamCrest;
+
+    playerMatchData = db.rants[matchId][playerId];
+    playerMatchData.rants[rantKey] = (playerMatchData.rants[rantKey] || 0) + 1;
+    playerMatchData.totalRants += 1;
+    if (playerName) playerMatchData.playerName = playerName;
+    if (playerPhoto) playerMatchData.playerPhoto = playerPhoto;
+    if (teamId) playerMatchData.teamId = teamId;
+    if (teamName) playerMatchData.teamName = teamName;
+    if (teamCrest) playerMatchData.teamCrest = teamCrest;
+
+    // 2. Update global tournament totals for Player
+    if (!db.totals.players[playerId]) {
+      db.totals.players[playerId] = {
+        totalRants: 0,
+        name: playerName || '',
+        photo: playerPhoto || '',
+        teamId: teamId || '',
+        teamName: teamName || ''
+      };
+    }
+    db.totals.players[playerId].totalRants += 1;
+    if (playerName) db.totals.players[playerId].name = playerName;
+    if (playerPhoto) db.totals.players[playerId].photo = playerPhoto;
+    if (teamId) db.totals.players[playerId].teamId = teamId;
+    if (teamName) db.totals.players[playerId].teamName = teamName;
+
+    // 3. Update global tournament totals for Team
+    if (teamId) {
+      if (!db.totals.teams[teamId]) {
+        db.totals.teams[teamId] = {
+          totalRants: 0,
+          name: teamName || '',
+          crest: teamCrest || ''
+        };
+      }
+      db.totals.teams[teamId].totalRants += 1;
+      if (teamName) db.totals.teams[teamId].name = teamName;
+      if (teamCrest) db.totals.teams[teamId].crest = teamCrest;
+    }
   }
 
   // 3.5. Update recent rants log
@@ -183,7 +187,7 @@ export async function addRant({ matchId, playerId, playerName, playerPhoto, team
   }
   db.recentRants[matchId].push({
     id: `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-    playerId,
+    playerId: playerId || null,
     playerName: playerName || '',
     rantKey,
     userId,
@@ -215,7 +219,7 @@ export async function addRant({ matchId, playerId, playerName, playerPhoto, team
   await saveDb();
   globalThis.lastRedisFetchTime = Date.now();
 
-  return playerMatchData;
+  return playerId ? playerMatchData : { success: true };
 }
 
 export async function getUserProfile(userId) {

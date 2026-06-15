@@ -352,7 +352,7 @@ export async function POST({ request }) {
     const body = await request.json();
     const { matchId, playerId, playerName, playerPhoto, teamId, teamName, teamCrest, rantKey, userId, userName, userAvatar } = body;
     
-    if (!matchId || !playerId || !rantKey) {
+    if (!matchId || !rantKey) {
       return new Response(JSON.stringify({ error: "Missing parameters" }), {
         status: 400,
         headers: { 'Content-Type': 'application/json' }

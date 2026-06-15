@@ -245,6 +245,12 @@ export default function MatchZone({ matchId, onBack, userProfile }) {
   const [userPrediction, setUserPrediction] = useState(null);
   const [rainElements, setRainElements] = useState([]);
   const lastRainTime = useRef(0);
+  const [currentUserId, setCurrentUserId] = useState(null);
+  const [chatInput, setChatInput] = useState("");
+
+  useEffect(() => {
+    setCurrentUserId(getCookie("rage_user_id"));
+  }, []);
 
   // Teams State
   const [homeTeam, setHomeTeam] = useState({
@@ -316,6 +322,52 @@ export default function MatchZone({ matchId, onBack, userProfile }) {
       }
     } catch (e) {
       console.error("Failed to save prediction:", e);
+    }
+  };
+
+  const handleSendChatMessage = async () => {
+    if (!chatInput.trim()) return;
+
+    const msgText = chatInput.trim();
+    setChatInput(""); // snappy UI clear
+
+    const uid = currentUserId || getCookie("rage_user_id");
+    const tempId = `temp_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    const tempMessage = {
+      id: tempId,
+      playerId: null,
+      playerName: "",
+      rantKey: msgText,
+      userId: uid,
+      userName: userProfile?.name || 'تماشاگر ناشناس',
+      userAvatar: userProfile?.avatar || '',
+      timestamp: Date.now()
+    };
+
+    setRantHistory(prev => [tempMessage, ...prev]);
+
+    try {
+      await fetch("/api/match", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          matchId,
+          playerId: null,
+          playerName: "",
+          playerPhoto: "",
+          teamId: "",
+          teamName: "",
+          teamCrest: "",
+          rantKey: msgText,
+          userId: uid,
+          userName: userProfile?.name || 'تماشاگر ناشناس',
+          userAvatar: userProfile?.avatar || ''
+        }),
+      });
+    } catch (err) {
+      console.error("Failed to send chat message:", err);
     }
   };
 
@@ -1616,27 +1668,9 @@ export default function MatchZone({ matchId, onBack, userProfile }) {
           </div>
         </div>
 
-        {/* Tab Selector inside MatchZone */}
-        {matchStatus !== "WAITING" && (
-          <div className="match-zone-tabs">
-            <button 
-              className={`match-zone-tab-btn ${matchTab === 'lineup' ? 'active' : ''}`}
-              onClick={() => setMatchTab('lineup')}
-            >
-              📋 ترکیب تیم‌ها
-            </button>
-            <button 
-              className={`match-zone-tab-btn ${matchTab === 'history' ? 'active' : ''}`}
-              onClick={() => setMatchTab('history')}
-            >
-              💬 دیوار خشم زنده
-            </button>
-          </div>
-        )}
-
         {/* Conditional Tab Rendering */}
-        {matchTab === 'lineup' || matchStatus === "WAITING" ? (
-          <div className="native-roster-columns">
+        {matchTab === 'lineup' ? (
+          <div className="native-roster-columns" style={{ paddingBottom: '74px' }}>
             {/* Right Column: Home Team */}
             <div className="native-roster-column">
               {renderTeamRoster(homePlayers, homeBench)}
@@ -1648,16 +1682,17 @@ export default function MatchZone({ matchId, onBack, userProfile }) {
             </div>
           </div>
         ) : (
-          <div className="rant-history-feed-container">
+          <div className="rant-history-feed-container" style={{ paddingBottom: '130px' }}>
             {rantHistory.length > 0 ? (
               <div className="rant-history-list">
                 {rantHistory.map((rant) => {
                   const defaultEmojis = ['⚽', '🏆', '💩', '🤡', '👑', '🏃‍♂️', '🧤', '🍔', '🍺', '🦖'];
                   const isEmoji = rant.userAvatar && defaultEmojis.includes(rant.userAvatar);
                   const rantText = PREDEFINED_RANTS.find(r => r.key === rant.rantKey)?.persianText || rant.rantKey;
+                  const isMyMessage = rant.userId === currentUserId;
                   
                   return (
-                    <div key={rant.id} className="rant-feed-item">
+                    <div key={rant.id} className={`rant-feed-item ${isMyMessage ? 'my-message' : ''}`}>
                       <div className="rant-feed-avatar-wrapper">
                         {!rant.userAvatar ? (
                           <div className="rant-feed-avatar initials">{rant.userName ? rant.userName.trim().charAt(0) : '👤'}</div>
@@ -1673,10 +1708,18 @@ export default function MatchZone({ matchId, onBack, userProfile }) {
                       <div className="rant-feed-content">
                         <div className="rant-feed-meta">
                           <span className="rant-feed-username">{rant.userName}</span>
-                          <span className="rant-feed-time">{new Date(rant.timestamp).toLocaleTimeString('fa-IR', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</span>
+                          <span className="rant-feed-time">{new Date(rant.timestamp).toLocaleTimeString('fa-IR', { hour: '2-digit', minute: '2-digit' })}</span>
                         </div>
-                        <div className="rant-feed-body">
-                          به <strong style={{ color: 'var(--color-danger)' }}>{rant.playerName}</strong> غر زد: «<span className="rant-feed-text">{rantText}</span>»
+                        <div className="rant-feed-bubble">
+                          <div className="rant-feed-body">
+                            {rant.playerName ? (
+                              <>
+                                به <strong style={{ color: 'var(--color-danger)' }}>{rant.playerName}</strong> غر زد: «<span className="rant-feed-text">{rantText}</span>»
+                              </>
+                            ) : (
+                              <span className="rant-feed-text">{rantText}</span>
+                            )}
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -1686,10 +1729,32 @@ export default function MatchZone({ matchId, onBack, userProfile }) {
             ) : (
               <div className="rant-history-empty">
                 <span>💬</span>
-                <p>هنوز هیچ فحش یا غری برای این بازی ثبت نشده است.</p>
-                {matchStatus === "LIVE" && <p className="blink-soft">اولین نفر باشید که تخلیه خشم می‌کند!</p>}
+                <p>هنوز هیچ پیامی برای این بازی ثبت نشده است.</p>
+                {matchStatus === "LIVE" && <p className="blink-soft">اولین نفر باشید که پیام ارسال می‌کند!</p>}
               </div>
             )}
+          </div>
+        )}
+
+        {/* Chat input bar rendered when Chat is active */}
+        {matchTab === 'history' && (
+          <div className="chat-input-bar">
+            <input 
+              type="text" 
+              placeholder="ارسال پیام به استادیوم..." 
+              value={chatInput}
+              onChange={(e) => setChatInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') handleSendChatMessage();
+              }}
+              maxLength={100}
+            />
+            <button onClick={handleSendChatMessage} disabled={!chatInput.trim()} aria-label="ارسال">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="22" y1="2" x2="11" y2="13"></line>
+                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+              </svg>
+            </button>
           </div>
         )}
       </>
@@ -1774,6 +1839,24 @@ export default function MatchZone({ matchId, onBack, userProfile }) {
           )}
         </div>
       </dialog>
+
+      {/* Fixed bottom navigation tabs inside MatchZone */}
+      <nav className="native-bottom-nav">
+        <button
+          onClick={() => setMatchTab('lineup')}
+          className={`native-nav-item ${matchTab === 'lineup' ? 'active' : ''}`}
+        >
+          <span className="nav-item-icon">📋</span>
+          <span className="nav-item-label">ترکیب تیم‌ها</span>
+        </button>
+        <button
+          onClick={() => setMatchTab('history')}
+          className={`native-nav-item ${matchTab === 'history' ? 'active' : ''}`}
+        >
+          <span className="nav-item-icon">💬</span>
+          <span className="nav-item-label">چت</span>
+        </button>
+      </nav>
     </div>
   );
 }

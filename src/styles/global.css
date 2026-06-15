@@ -1940,17 +1940,18 @@ dialog.md3-bottom-sheet[open] .sheet-container {
 .rant-feed-item {
   display: flex;
   align-items: flex-start;
-  gap: 12px;
-  background-color: var(--color-surface);
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
-  padding: 10px 14px;
+  gap: 8px;
+  background: none;
+  border: none;
+  border-radius: 0;
+  padding: 6px 0;
   animation: scaleUp 0.2s ease-out forwards;
+  width: 100%;
 }
 
 .rant-feed-avatar-wrapper {
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   overflow: hidden;
   background-color: rgba(255, 255, 255, 0.03);
@@ -1965,12 +1966,12 @@ dialog.md3-bottom-sheet[open] .sheet-container {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  font-size: 0.8rem;
+  font-size: 0.7rem;
   font-weight: 800;
 }
 
 .rant-feed-avatar.emoji {
-  font-size: 1.25rem;
+  font-size: 1.1rem;
   background: none;
   border: none;
 }
@@ -1978,7 +1979,7 @@ dialog.md3-bottom-sheet[open] .sheet-container {
 .rant-feed-avatar.initials {
   background-color: var(--color-danger);
   color: #fff;
-  font-size: 0.8rem;
+  font-size: 0.7rem;
   font-weight: 800;
   width: 100%;
   height: 100%;
@@ -1992,37 +1993,70 @@ dialog.md3-bottom-sheet[open] .sheet-container {
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  align-items: flex-start; /* Aligns to right in RTL */
+  gap: 2px;
 }
 
 .rant-feed-meta {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  width: 100%;
+  padding: 0 4px;
 }
 
 .rant-feed-username {
-  font-size: 0.775rem;
+  font-size: 0.7rem;
   font-weight: 700;
-  color: var(--text-secondary);
+  color: rgba(255, 255, 255, 0.45);
 }
 
 .rant-feed-time {
-  font-size: 0.65rem;
+  font-size: 0.55rem;
   color: var(--text-hint);
   font-family: var(--font-en);
 }
 
+.rant-feed-bubble {
+  background-color: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-color);
+  border-radius: 12px 0 12px 12px; /* RTL rounded corners for other users' messages */
+  padding: 6px 10px;
+  display: inline-block;
+  max-width: 85%;
+  align-self: flex-start;
+}
+
 .rant-feed-body {
-  font-size: 0.825rem;
-  line-height: 1.5;
+  font-size: 0.775rem;
+  line-height: 1.4;
   color: var(--text-primary);
   direction: rtl;
   text-align: right;
 }
 
 .rant-feed-text {
-  font-weight: 700;
+  font-weight: 600;
+}
+
+/* Current User Message Styling */
+.rant-feed-item.my-message {
+  flex-direction: row-reverse; /* Flip avatar and content */
+}
+
+.rant-feed-item.my-message .rant-feed-meta {
+  flex-direction: row-reverse; /* Flip name and time */
+}
+
+.rant-feed-item.my-message .rant-feed-content {
+  align-items: flex-end; /* Align bubble to left in RTL */
+}
+
+.rant-feed-item.my-message .rant-feed-bubble {
+  background: linear-gradient(135deg, rgba(255, 62, 62, 0.15), rgba(255, 62, 62, 0.05));
+  border-color: rgba(255, 62, 62, 0.25);
+  border-radius: 0 12px 12px 12px; /* Top-left sharp corner for my-message */
+  align-self: flex-end;
 }
 
 .rant-history-empty {
@@ -2078,5 +2112,75 @@ dialog.md3-bottom-sheet[open] .sheet-container {
     transform: translateY(110vh) rotate(360deg);
     opacity: 0;
   }
+}
+
+/* Chat Input Bar */
+.chat-input-bar {
+  position: fixed;
+  bottom: 64px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 480px;
+  height: 54px;
+  background-color: rgba(18, 20, 23, 0.95);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  padding: 6px 12px;
+  box-sizing: border-box;
+  z-index: 999;
+  gap: 8px;
+  direction: rtl; /* Right to left for Persian input */
+}
+
+.chat-input-bar input {
+  flex: 1;
+  height: 38px;
+  border-radius: 20px;
+  border: 1px solid var(--border-color);
+  background-color: rgba(255, 255, 255, 0.04);
+  color: var(--text-primary);
+  padding: 0 16px;
+  font-family: inherit;
+  font-size: 0.8rem;
+  outline: none;
+  transition: all 0.2s;
+  text-align: right;
+  box-sizing: border-box;
+}
+
+.chat-input-bar input:focus {
+  border-color: var(--color-danger);
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+.chat-input-bar button {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: none;
+  background-color: var(--color-danger);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.chat-input-bar button:active {
+  transform: scale(0.92);
+  opacity: 0.85;
+}
+
+.chat-input-bar button:disabled {
+  background-color: rgba(255, 255, 255, 0.04);
+  color: var(--text-hint);
+  cursor: not-allowed;
+  transform: none;
 }
 
