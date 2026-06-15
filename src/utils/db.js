@@ -1,50 +1,80 @@
-import fs from 'fs/promises';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import Redis from 'ioredis';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const DB_FILE = path.resolve(__dirname, '../data/rants.json');
+const redisUrl = (typeof process !== 'undefined' && process.env?.REDIS_URL) || 
+                 (typeof import.meta !== 'undefined' && import.meta.env?.REDIS_URL);
 
-let cachedDb = null;
-let writeQueue = Promise.resolve();
+const hasRedis = !!redisUrl;
 
-// Ensure the data directory exists
-async function ensureDir(filePath) {
-  const dir = path.dirname(filePath);
+let redisClient = null;
+if (hasRedis) {
   try {
-    await fs.mkdir(dir, { recursive: true });
+    redisClient = new Redis(redisUrl);
+    redisClient.on('error', (err) => {
+      console.error('Redis connection error:', err);
+    });
   } catch (err) {
-    // Directory might already exist
+    console.error('Failed to create Redis client instance:', err);
   }
 }
 
+let cachedDb = null;
+
 export async function initDb() {
-  if (cachedDb) return cachedDb;
-  
-  try {
-    await ensureDir(DB_FILE);
-    const data = await fs.readFile(DB_FILE, 'utf-8');
-    cachedDb = JSON.parse(data);
-  } catch (error) {
-    // If file doesn't exist, initialize default structures
-    cachedDb = {
-      rants: {}, // matchId -> playerId -> { totalRants, rants, playerName, playerPhoto, teamId, teamName, teamCrest }
-      totals: {
-        players: {}, // playerId -> { totalRants, name, photo, teamId, teamName }
-        teams: {},   // teamId -> { totalRants, name, crest }
-      }
-    };
+  if (hasRedis && redisClient) {
     try {
-      await fs.writeFile(DB_FILE, JSON.stringify(cachedDb, null, 2), 'utf-8');
-    } catch (writeErr) {
-      console.error("Failed to initialize database file:", writeErr);
+      const data = await redisClient.get('rants_db');
+      if (data) {
+        cachedDb = JSON.parse(data);
+      } else {
+        cachedDb = {
+          rants: {},
+          totals: {
+            players: {},
+            teams: {},
+          }
+        };
+        await redisClient.set('rants_db', JSON.stringify(cachedDb));
+      }
+    } catch (error) {
+      console.error("Failed to initialize database from Redis:", error);
+      if (!cachedDb) {
+        cachedDb = {
+          rants: {},
+          totals: {
+            players: {},
+            teams: {},
+          }
+        };
+      }
+    }
+  } else {
+    // RAM mode
+    if (!cachedDb) {
+      cachedDb = {
+        rants: {},
+        totals: {
+          players: {},
+          teams: {},
+        }
+      };
     }
   }
   return cachedDb;
 }
 
 export async function getDb() {
+  if (hasRedis && redisClient) {
+    try {
+      const data = await redisClient.get('rants_db');
+      if (data) {
+        cachedDb = JSON.parse(data);
+        return cachedDb;
+      }
+    } catch (error) {
+      console.error("Failed to get database from Redis:", error);
+    }
+  }
+  
   if (!cachedDb) {
     await initDb();
   }
@@ -52,23 +82,25 @@ export async function getDb() {
 }
 
 async function saveDb() {
-  try {
-    await fs.writeFile(DB_FILE, JSON.stringify(cachedDb, null, 2), 'utf-8');
-  } catch (error) {
-    console.error("Failed to save database to disk:", error);
+  if (hasRedis && redisClient) {
+    try {
+      await redisClient.set('rants_db', JSON.stringify(cachedDb));
+    } catch (error) {
+      console.error("Failed to save database to Redis:", error);
+    }
   }
+  // For RAM mode, it's already updated in memory since it's a reference
 }
 
 export async function addRant({ matchId, playerId, playerName, playerPhoto, teamId, teamName, teamCrest, rantKey, userId }) {
-  // Ensure DB is loaded in memory
-  await getDb();
+  const db = await getDb();
 
-  // 1. Update Match-specific rants in memory cache
-  if (!cachedDb.rants[matchId]) {
-    cachedDb.rants[matchId] = {};
+  // 1. Update Match-specific rants
+  if (!db.rants[matchId]) {
+    db.rants[matchId] = {};
   }
-  if (!cachedDb.rants[matchId][playerId]) {
-    cachedDb.rants[matchId][playerId] = {
+  if (!db.rants[matchId][playerId]) {
+    db.rants[matchId][playerId] = {
       totalRants: 0,
       rants: {},
       playerName: playerName || '',
@@ -79,7 +111,7 @@ export async function addRant({ matchId, playerId, playerName, playerPhoto, team
     };
   }
 
-  const playerMatchData = cachedDb.rants[matchId][playerId];
+  const playerMatchData = db.rants[matchId][playerId];
   playerMatchData.rants[rantKey] = (playerMatchData.rants[rantKey] || 0) + 1;
   playerMatchData.totalRants += 1;
   if (playerName) playerMatchData.playerName = playerName;
@@ -88,9 +120,9 @@ export async function addRant({ matchId, playerId, playerName, playerPhoto, team
   if (teamName) playerMatchData.teamName = teamName;
   if (teamCrest) playerMatchData.teamCrest = teamCrest;
 
-  // 2. Update global tournament totals for Player in memory cache
-  if (!cachedDb.totals.players[playerId]) {
-    cachedDb.totals.players[playerId] = {
+  // 2. Update global tournament totals for Player
+  if (!db.totals.players[playerId]) {
+    db.totals.players[playerId] = {
       totalRants: 0,
       name: playerName || '',
       photo: playerPhoto || '',
@@ -98,28 +130,29 @@ export async function addRant({ matchId, playerId, playerName, playerPhoto, team
       teamName: teamName || ''
     };
   }
-  cachedDb.totals.players[playerId].totalRants += 1;
-  if (playerName) cachedDb.totals.players[playerId].name = playerName;
-  if (playerPhoto) cachedDb.totals.players[playerId].photo = playerPhoto;
-  if (teamId) cachedDb.totals.players[playerId].teamId = teamId;
-  if (teamName) cachedDb.totals.players[playerId].teamName = teamName;
+  db.totals.players[playerId].totalRants += 1;
+  if (playerName) db.totals.players[playerId].name = playerName;
+  if (playerPhoto) db.totals.players[playerId].photo = playerPhoto;
+  if (teamId) db.totals.players[playerId].teamId = teamId;
+  if (teamName) db.totals.players[playerId].teamName = teamName;
 
-  // 3. Update global tournament totals for Team in memory cache
+  // 3. Update global tournament totals for Team
   if (teamId) {
-    if (!cachedDb.totals.teams[teamId]) {
-      cachedDb.totals.teams[teamId] = {
+    if (!db.totals.teams[teamId]) {
+      db.totals.teams[teamId] = {
         totalRants: 0,
         name: teamName || '',
         crest: teamCrest || ''
       };
     }
-    cachedDb.totals.teams[teamId].totalRants += 1;
-    if (teamName) cachedDb.totals.teams[teamId].name = teamName;
-    if (teamCrest) cachedDb.totals.teams[teamId].crest = teamCrest;
+    db.totals.teams[teamId].totalRants += 1;
+    if (teamName) db.totals.teams[teamId].name = teamName;
+    if (teamCrest) db.totals.teams[teamId].crest = teamCrest;
   }
 
-  // 4. Asynchronously queue writing the updated memory cache to JSON disk
-  writeQueue = writeQueue.then(() => saveDb());
+  // 4. Save to persistent storage
+  cachedDb = db;
+  await saveDb();
 
   return playerMatchData;
 }
