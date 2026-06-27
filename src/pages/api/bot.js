@@ -18,7 +18,7 @@ export async function POST({ request }) {
 
     if (message && message.chat && message.chat.id) {
       const chatId = message.chat.id;
-      const responseText = "به استادیوم خشم خوش آمدید! 🏟️\n\nدر جریان بازی‌های زنده جام جهانی خشم و کلافگی خود را از بازی ضعیف بازیکنان خالی کنید و به اعصاب‌خردکن‌ترین بازیکن مسابقه رای دهید.";
+      const responseText = "به استادیوم بنجل‌ها خوش آمدید! 🏟️\n\nدر جریان بازی‌های زنده جام جهانی بازیکنان و تیم‌های بنجل را هو کنید و بنجل‌ترین‌های مسابقات را انتخاب کنید.";
 
       const url = `https://api.telegram.org/bot${token}/sendMessage`;
       const telegramRes = await fetch(url, {
@@ -33,9 +33,9 @@ export async function POST({ request }) {
             inline_keyboard: [
               [
                 {
-                  text: "ورود به استادیوم خشم 🏟️",
+                  text: "ورود به استادیوم بنجل‌ها 🏟️",
                   web_app: {
-                    url: "https://fuck-wc-2026.vercel.app/"
+                    url: "https://bonjol-stadium-2026.vercel.app/"
                   }
                 }
               ]

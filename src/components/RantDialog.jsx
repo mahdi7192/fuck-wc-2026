@@ -75,11 +75,6 @@ export default function RantDialog({
     .sort((a, b) => b.count - a.count)
     .slice(0, 10);
 
-  // Split into 3 rows for horizontal flow
-  const row1 = predefinedRants.slice(0, 5);
-  const row2 = predefinedRants.slice(5, 10);
-  const row3 = predefinedRants.slice(10, 15);
-
   return (
     <dialog
       ref={dialogRef}
@@ -176,15 +171,37 @@ export default function RantDialog({
             <span>{posLabel}</span>
             <span style={{ color: 'var(--border-color-active)' }}>•</span>
             <span style={{ color: player.totalRants > 0 ? 'var(--color-danger)' : 'var(--text-hint)', fontWeight: '700' }}>
-              {player.totalRants} فحش ثبت‌شده
+              {player.totalRants} بار هو شده
             </span>
           </div>
         </div>
 
-        {/* Section 1: Curses Analytics (Top 10) at the Top */}
+        {/* Section 1: Booing Action Chips in 2 Columns at the Top (if Live) */}
+        {matchStatus === 'LIVE' && (
+          <div className="native-dialog-section" style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: '14px', flexShrink: 0 }}>
+            <h3 className="native-dialog-section-title" style={{ marginBottom: '8px' }}>
+              هو کردن بازیکن 📢
+            </h3>
+            
+            <div className="native-rants-vertical-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', padding: '4px 0' }}>
+              {predefinedRants.map((rant) => (
+                <button
+                  key={rant.key}
+                  onClick={(e) => onRant(player.id, rant.key, e)}
+                  className="native-rant-chip"
+                  style={{ width: '100%', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', padding: '8px 6px', fontSize: '0.75rem', textAlign: 'center' }}
+                >
+                  {rant.persianText}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Section 2: Curses Analytics (Top 10) at the Bottom */}
         <div className="native-dialog-section" style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', paddingBottom: '10px' }}>
           <h3 className="native-dialog-section-title" style={{ marginBottom: '6px' }}>
-            آمار فحش‌های ثبت‌شده ({totalRants} بار)
+            آمار هوهای ثبت‌شده ({totalRants} بار)
           </h3>
           
           <div className="native-analytics-list" style={{ display: 'flex', flexDirection: 'column', gap: '8px', flex: 1, overflowY: 'auto', paddingRight: '4px' }}>
@@ -208,53 +225,6 @@ export default function RantDialog({
             })}
           </div>
         </div>
-
-        {/* Section 2: Cursing Action Chips in 3 Horizontal Rows at the Bottom */}
-        {matchStatus === 'LIVE' && (
-          <div className="native-dialog-section" style={{ borderBottom: 'none', paddingBottom: 0, flexShrink: 0 }}>
-            <h3 className="native-dialog-section-title">
-              ثبت فحش (تخلیه خشم)
-            </h3>
-            
-            <div className="native-rants-scroll-container">
-              <div className="native-rants-scroll-row">
-                {row1.map((rant) => (
-                  <button
-                    key={rant.key}
-                    onClick={(e) => onRant(player.id, rant.key, e)}
-                    className="native-rant-chip"
-                  >
-                    {rant.persianText}
-                  </button>
-                ))}
-              </div>
-              
-              <div className="native-rants-scroll-row">
-                {row2.map((rant) => (
-                  <button
-                    key={rant.key}
-                    onClick={(e) => onRant(player.id, rant.key, e)}
-                    className="native-rant-chip"
-                  >
-                    {rant.persianText}
-                  </button>
-                ))}
-              </div>
-
-              <div className="native-rants-scroll-row">
-                {row3.map((rant) => (
-                  <button
-                    key={rant.key}
-                    onClick={(e) => onRant(player.id, rant.key, e)}
-                    className="native-rant-chip"
-                  >
-                    {rant.persianText}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
       </div>
     </dialog>
   );

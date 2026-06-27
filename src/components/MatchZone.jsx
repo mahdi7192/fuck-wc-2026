@@ -85,21 +85,16 @@ const fetchPlayerPhoto = async (playerName) => {
 
 // Predefined list of Persian football rants
 const PREDEFINED_RANTS = [
-  { key: "walk", persianText: "راه برو فقط! 🚶‍♂️" },
   { key: "pass", persianText: "پاس بده دیگه! ⚽" },
-  { key: "miss", persianText: "دروازه خالی رو گل نکرد! 🤦‍♂️" },
-  { key: "shoot", persianText: "چرا شوت نمی‌زنی؟ 😤" },
+  { key: "shoot", persianText: "چرا شوت نمیزنی؟ 😤" },
   { key: "dribble", persianText: "مگه مجبوری دریبل بزنی؟ 👟" },
-  { key: "sub", persianText: "مربی تعویضش کن! 🔄" },
+  { key: "miss", persianText: "دروازه خالی رو گل نکرد! 🤦‍♂️" },
+  { key: "lazy", persianText: "داره قدم میزنه! 🚶" },
   { key: "defense", persianText: "دفاع سوراخ! 🕳️" },
-  { key: "card", persianText: "کارت زرد بیخود! 🟨" },
+  { key: "sub", persianText: "مربی تعویضش کن! 🔄" },
   { key: "sleep", persianText: "اصلا تو باغ نیست! 🌳" },
-  { key: "air", persianText: "سایه توپ رو زد! 💨" },
-  { key: "lazy", persianText: "داره قدم می‌زنه! 🚶" },
   { key: "lose", persianText: "توپ لو دادن تخصصشه! 📉" },
-  { key: "dive", persianText: "شیرجه الکی! 🏊" },
-  { key: "slow", persianText: "کندی مثل حلزون! 🐌" },
-  { key: "back", persianText: "پاس رو به عقب اعصاب‌خردکن! 🔙" },
+  { key: "slow", persianText: "کند مثل حلزون! 🐌" },
 ];
 
 // Helper to generate a generic 11-player lineup if API squad details are unavailable
@@ -246,6 +241,7 @@ export default function MatchZone({ matchId, onBack, userProfile, userId }) {
   const [rainElements, setRainElements] = useState([]);
   const lastRainTime = useRef(0);
   const [chatInput, setChatInput] = useState("");
+  const [utcDate, setUtcDate] = useState(null);
 
   // Teams State
   const [homeTeam, setHomeTeam] = useState({
@@ -287,35 +283,13 @@ export default function MatchZone({ matchId, onBack, userProfile, userId }) {
     return null;
   };
 
-  useEffect(() => {
-    if (userId && matchId) {
-      fetch(`/api/prediction?userId=${userId}&matchId=${matchId}`)
-        .then(res => res.json())
-        .then(data => {
-          if (data.playerId) {
-            setUserPrediction(data.playerId);
-          }
-        })
-        .catch(err => console.error("Failed to fetch user prediction:", err));
-    }
-  }, [userId, matchId]);
-
-  const handlePredict = async (playerId) => {
-    if (!userId) return;
-    try {
-      const res = await fetch("/api/prediction", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId, matchId, playerId })
-      });
-      const data = await res.json();
-      if (data.success) {
-        setUserPrediction(playerId);
-        setToastMessage("پیش‌بینی بنجل مسابقه ثبت شد!");
-      }
-    } catch (e) {
-      console.error("Failed to save prediction:", e);
-    }
+  const isLineupReady = () => {
+    if (matchStatus !== 'WAITING') return true;
+    if (!utcDate) return false;
+    const kickoff = new Date(utcDate);
+    const now = new Date();
+    const diffMs = kickoff.getTime() - now.getTime();
+    return diffMs <= 60 * 60 * 1000;
   };
 
   const handleSendChatMessage = async () => {
@@ -1064,6 +1038,7 @@ export default function MatchZone({ matchId, onBack, userProfile, userId }) {
         setMatchMinutes(0);
         setWaitingCountdown(selectedMatch.utcDate);
       }
+      setUtcDate(selectedMatch.utcDate);
 
       // Map lineup players
       let homeLineup = selectedMatch.homeTeam.lineup || [];
@@ -1346,7 +1321,7 @@ export default function MatchZone({ matchId, onBack, userProfile, userId }) {
   };
 
   const getRantKingSummary = (king) => {
-    if (!king) return "بازی آرامی بود و تماشاچیان خشم زیادی را ابراز نکردند!";
+    if (!king) return "بازی آرامی بود و تماشاچیان اعتراض زیادی را ابراز نکردند!";
 
     let topRantKey = "";
     let maxRantVal = -1;
@@ -1359,13 +1334,13 @@ export default function MatchZone({ matchId, onBack, userProfile, userId }) {
 
     const topRantText =
       PREDEFINED_RANTS.find((r) => r.key === topRantKey)?.persianText ||
-      "راه برو فقط!";
+      "پاس بده دیگه! ⚽";
     const teamName = king.side === "home" ? homeTeam.name : awayTeam.name;
 
     const jokes = [
-      `امروز جناب «${king.name}» بازیکن تیم ${teamName} ثابت کرد که حتی اگر کاری هم نکند، روی مخ راه رفتن تخصص اوست! او با ثبت ${king.totalRants} خشم، مغز اعصاب‌خردکنی جام جهانی ۲۰۲۶ لقب گرفت. بیشترین فحش: «${topRantText}»!`,
-      `خسته نباشی قهرمان! جناب «${king.name}» از تیم ${teamName} با ${king.totalRants} فحش داغ، رسماً روح و روان تماشاگران را به کما برد! ملت شاکی‌اند که چرا مدام «${topRantText}»!`,
-      `تاج خشم امروز جام جهانی ۲۰۲۶ به سر «${king.name}» (${teamName}) نشست! او با کسب ${king.totalRants} امتیاز نارضایتی، تمام رقبا را خاکستر کرد. بیشترین فحش: «${topRantText}».`,
+      `امروز جناب «${king.name}» بازیکن تیم ${teamName} ثابت کرد که حتی اگر کاری هم نکند، روی مخ راه رفتن تخصص اوست! او با ثبت ${king.totalRants} بار هو شدن، بنجل‌ترین بازیکن مسابقه لقب گرفت. بیشترین هو: «${topRantText}»!`,
+      `خسته نباشی قهرمان! جناب «${king.name}» از تیم ${teamName} با ${king.totalRants} بار هو شدن، رسماً روح و روان تماشاگران را به کما برد! ملت شاکی‌اند که چرا مدام «${topRantText}»!`,
+      `عنوان بنجل مسابقه امروز جام جهانی ۲۰۲۶ به سر «${king.name}» (${teamName}) نشست! او با کسب ${king.totalRants} بار هو شدن، تمام رقبا را خاکستر کرد. بیشترین هو: «${topRantText}».`,
     ];
 
     return jokes[king.id % jokes.length];
@@ -1376,18 +1351,13 @@ export default function MatchZone({ matchId, onBack, userProfile, userId }) {
     const isHome = player.side === "home";
     const posColor = getPositionColor(player.position);
     const hasMostRants = maxRants > 0 && player.totalRants === maxRants;
-    const isWaiting = matchStatus === "WAITING";
     return (
       <div
         key={player.id}
-        onClick={
-          isWaiting
-            ? () => handlePredict(player.id)
-            : () => {
-                setSelectedPlayer(player);
-                setIsModalOpen(true);
-              }
-        }
+        onClick={() => {
+          setSelectedPlayer(player);
+          setIsModalOpen(true);
+        }}
         className={`native-player-row ${isHome ? "home-row" : "away-row"}`}
         style={{
           opacity:
@@ -1482,26 +1452,7 @@ export default function MatchZone({ matchId, onBack, userProfile, userId }) {
               >
                 ({player.totalRants})
               </span>
-              {isWaiting && (
-                <span 
-                  className={`predict-badge-inline ${userPrediction === player.id ? 'predicted' : ''}`}
-                  style={{
-                    fontSize: '0.65rem',
-                    padding: '1px 5px',
-                    borderRadius: '4px',
-                    backgroundColor: userPrediction === player.id ? 'var(--color-danger)' : 'rgba(255,255,255,0.06)',
-                    color: '#fff',
-                    marginRight: '6px',
-                    fontWeight: '700',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '2px'
-                  }}
-                >
-                  💩 {userPrediction === player.id ? 'پیش‌بینی شما' : 'بنجل؟'}
-                </span>
-              )}
-            </span>
+              </span>
             <span
               className={`active-rant-bubble ${player.activeRant ? "active" : ""}`}
             >
@@ -1521,7 +1472,7 @@ export default function MatchZone({ matchId, onBack, userProfile, userId }) {
                 alignItems: "center",
                 justifyContent: "center",
               }}
-              title="بیشترین فحش مسابقه"
+              title="بیشترین هو مسابقه"
             >
               💩
             </span>
@@ -1670,17 +1621,27 @@ export default function MatchZone({ matchId, onBack, userProfile, userId }) {
 
         {/* Conditional Tab Rendering */}
         {matchTab === 'lineup' ? (
-          <div className="native-roster-columns" style={{ paddingBottom: '74px' }}>
-            {/* Right Column: Home Team */}
-            <div className="native-roster-column">
-              {renderTeamRoster(homePlayers, homeBench)}
+          !isLineupReady() ? (
+            <div className="lineup-not-ready-container" style={{ padding: '40px 16px', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '16px', background: 'var(--color-bg)', minHeight: '300px' }}>
+              <span style={{ fontSize: '3rem' }}>⏳</span>
+              <h3 style={{ fontSize: '1.2rem', fontWeight: '800', color: 'var(--text-primary)' }}>ترکیب تیم‌ها هنوز مشخص نشده است</h3>
+              <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', maxWidth: '280px', lineHeight: '1.5' }}>
+                ترکیب اصلی تیم‌ها ۱ ساعت قبل از شروع رسمی بازی اعلام و در این صفحه نمایش داده خواهد شد.
+              </p>
             </div>
+          ) : (
+            <div className="native-roster-columns" style={{ paddingBottom: '74px' }}>
+              {/* Right Column: Home Team */}
+              <div className="native-roster-column">
+                {renderTeamRoster(homePlayers, homeBench)}
+              </div>
 
-            {/* Left Column: Away Team */}
-            <div className="native-roster-column">
-              {renderTeamRoster(awayPlayers, awayBench)}
+              {/* Left Column: Away Team */}
+              <div className="native-roster-column">
+                {renderTeamRoster(awayPlayers, awayBench)}
+              </div>
             </div>
-          </div>
+          )
         ) : (
           <div ref={chatContainerRef} className="rant-history-feed-container" style={{ paddingBottom: '130px' }}>
             {rantHistory.length > 0 ? (

@@ -51,7 +51,7 @@ export default function Leaderboard() {
     return (
       <div className="leaderboard-loading-container">
         <div className="blink leaderboard-loading-text">
-          📊 در حال محاسبه میزان خشم تماشاگران...
+          📊 در حال محاسبه میزان هو شدن بنجل‌ها...
         </div>
         <div className="leaderboard-skeleton-list">
           {[1, 2, 3, 4, 5].map(i => (
@@ -83,18 +83,18 @@ export default function Leaderboard() {
       {/* Premium Dashboard Header */}
       <div className="leaderboard-header-banner">
         <div className="leaderboard-banner-item">
-          <span className="banner-icon">👑</span>
+          <span className="banner-icon">💩</span>
           <div className="banner-text">
-            <span className="banner-label">رو مخ‌ترین بازیکن جام</span>
+            <span className="banner-label">بنجل‌ترین بازیکن جام</span>
             <span className="banner-value">
               {players.length > 0 ? players[0].name : 'هنوز رایی ثبت نشده'}
             </span>
           </div>
         </div>
         <div className="leaderboard-banner-item">
-          <span className="banner-icon">💩</span>
+          <span className="banner-icon">🗑️</span>
           <div className="banner-text">
-            <span className="banner-label">رو مخ‌ترین تیم جام</span>
+            <span className="banner-label">بنجل‌ترین تیم جام</span>
             <span className="banner-value">
               {teams.length > 0 ? getPersianTeamName(teams[0].name) : 'هنوز رایی ثبت نشده'}
             </span>
@@ -108,19 +108,19 @@ export default function Leaderboard() {
           onClick={() => setActiveTab('players')}
           className={`leaderboard-tab-btn ${activeTab === 'players' ? 'active' : ''}`}
         >
-          🚶‍♂️ گه ترین بازیکنان
+          🚶‍♂️ بنجل‌ترین بازیکنان
         </button>
         <button
           onClick={() => setActiveTab('teams')}
           className={`leaderboard-tab-btn ${activeTab === 'teams' ? 'active' : ''}`}
         >
-          🛡️ گه ترین تیم‌ها
+          🛡️ بنجل‌ترین تیم‌ها
         </button>
         <button
           onClick={() => setActiveTab('users')}
           className={`leaderboard-tab-btn ${activeTab === 'users' ? 'active' : ''}`}
         >
-          🔥 سلاطین خشم
+          📢 شلوغ‌ترین تماشاچیان
         </button>
       </div>
 
@@ -154,7 +154,7 @@ export default function Leaderboard() {
                       </div>
                     </div>
                     <div className="leaderboard-item-stats">
-                      <span className="leaderboard-item-score">{player.totalRants} فحش</span>
+                      <span className="leaderboard-item-score">{player.totalRants} بار هو شده</span>
                       <div className="leaderboard-progress-track">
                         <div
                           className="leaderboard-progress-fill"
@@ -169,7 +169,7 @@ export default function Leaderboard() {
           ) : (
             <div className="leaderboard-empty">
               <span>🕊️</span>
-              <p>هنوز هیچ فحشی برای بازیکنی ثبت نشده است!</p>
+              <p>هنوز هیچ بازیکنی هو نشده است!</p>
             </div>
           )
         ) : activeTab === 'teams' ? (
@@ -191,7 +191,7 @@ export default function Leaderboard() {
                       </div>
                     </div>
                     <div className="leaderboard-item-stats">
-                      <span className="leaderboard-item-score">{team.totalRants} فحش</span>
+                      <span className="leaderboard-item-score">{team.totalRants} بار هو شده</span>
                       <div className="leaderboard-progress-track">
                         <div
                           className="leaderboard-progress-fill"
@@ -206,7 +206,7 @@ export default function Leaderboard() {
           ) : (
             <div className="leaderboard-empty">
               <span>🕊️</span>
-              <p>هنوز هیچ فحشی برای تیمی ثبت نشده است!</p>
+              <p>هنوز هیچ تیمی هو نشده است!</p>
             </div>
           )
         ) : (
@@ -245,11 +245,10 @@ export default function Leaderboard() {
                       </div>
                       <div className="leaderboard-item-details">
                         <span className="leaderboard-item-name">{user.name}</span>
-                        <span className="leaderboard-item-subtext">رتبه خشمگین: #{index + 1}</span>
                       </div>
                     </div>
                     <div className="leaderboard-item-stats">
-                      <span className="leaderboard-item-score">{user.totalRants} فحش</span>
+                      <span className="leaderboard-item-score">{user.totalRants} بار هو کرده</span>
                       <div className="leaderboard-progress-track">
                         <div
                           className="leaderboard-progress-fill"
@@ -264,7 +263,7 @@ export default function Leaderboard() {
           ) : (
             <div className="leaderboard-empty">
               <span>🕊️</span>
-              <p>هنوز هیچ تماشاگری فحش ثبت نکرده است!</p>
+              <p>هنوز هیچ تماشاگری هو ثبت نکرده است!</p>
             </div>
           )
         )}

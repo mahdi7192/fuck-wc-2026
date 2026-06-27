@@ -286,7 +286,7 @@ export default function AppShell() {
           <div className="blocker-logo">🏟️</div>
           <h2>ورود فقط از تلگرام</h2>
           <p>این برنامه فقط از داخل پیام‌رسان تلگرام به صورت مینی‌اپ قابل استفاده است. لطفا وارد ربات تلگرام شوید و دکمه ورود به استادیوم را بزنید.</p>
-          <a href="https://t.me/fuck_wc_2026_bot" className="tg-bot-btn">ورود به ربات تلگرام</a>
+          <a href="https://t.me/bonjol_stadium_2026_bot" className="tg-bot-btn">ورود به ربات تلگرام</a>
         </div>
       </div>
     );
@@ -311,7 +311,7 @@ export default function AppShell() {
             ) : null}
           </div>
           <div className="native-app-bar-center">
-            <h1 className="native-app-bar-title">استادیوم خشم</h1>
+            <h1 className="native-app-bar-title">استادیوم بنجل‌ها</h1>
             <p className="native-app-bar-subtitle">جام جهانی ۲۰۲۶</p>
           </div>
           <div className="native-app-bar-left">
@@ -368,7 +368,7 @@ export default function AppShell() {
             className={`native-nav-item ${activeTab === 'leaderboard' ? 'active' : ''}`}
           >
             <span className="nav-item-icon">🏆</span>
-            <span className="nav-item-label">جدول خشم</span>
+            <span className="nav-item-label">جدول بنجل‌ها</span>
           </button>
         </nav>
       )}
