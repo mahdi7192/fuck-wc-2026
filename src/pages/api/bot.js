@@ -35,7 +35,7 @@ export async function POST({ request }) {
                 {
                   text: "ورود به استادیوم بنجل‌ها 🏟️",
                   web_app: {
-                    url: "https://bonjol-stadium-2026.vercel.app/"
+                    url: "https://bonjol-wc-2026.vercel.app/"
                   }
                 }
               ]
