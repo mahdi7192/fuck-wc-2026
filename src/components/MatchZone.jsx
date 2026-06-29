@@ -284,12 +284,9 @@ export default function MatchZone({ matchId, onBack, userProfile, userId }) {
   };
 
   const isLineupReady = () => {
-    if (matchStatus !== 'WAITING') return true;
-    if (!utcDate) return false;
-    const kickoff = new Date(utcDate);
-    const now = new Date();
-    const diffMs = kickoff.getTime() - now.getTime();
-    return diffMs <= 60 * 60 * 1000;
+    if (loading) return true; // Keep true during loading so we don't flash "not ready" message
+    if (!homePlayers || homePlayers.length === 0) return false;
+    return true;
   };
 
   const handleSendChatMessage = async () => {
@@ -1046,13 +1043,7 @@ export default function MatchZone({ matchId, onBack, userProfile, userId }) {
       let homeBenchList = selectedMatch.homeTeam.bench || [];
       let awayBenchList = selectedMatch.awayTeam.bench || [];
 
-      // Fallback to generic safe lineups in case of empty lineups (e.g. match scheduled and not announced)
-      if (homeLineup.length === 0) {
-        homeLineup = generateGenericLineup("home");
-      }
-      if (awayLineup.length === 0) {
-        awayLineup = generateGenericLineup("away");
-      }
+
 
       const mappedHome = mapTeamRoster(homeLineup, "home");
       const mappedAway = mapTeamRoster(awayLineup, "away");
@@ -1134,55 +1125,10 @@ export default function MatchZone({ matchId, onBack, userProfile, userId }) {
       // Fallback
       setHomeTeam({ name: "خطا در اتصال", crest: "" });
       setAwayTeam({ name: "خطا در اتصال", crest: "" });
-      const fallbackHome = mapTeamRoster(generateGenericLineup("home"), "home");
-      const fallbackAway = mapTeamRoster(generateGenericLineup("away"), "away");
-
-      const simulatedHome = simulateRoster(
-        fallbackHome,
-        [],
-        "home",
-        "Home",
-        "Away",
-        { home: 0, away: 0 },
-        0,
-        "WAITING",
-      );
-      const simulatedAway = simulateRoster(
-        fallbackAway,
-        [],
-        "away",
-        "Home",
-        "Away",
-        { home: 0, away: 0 },
-        0,
-        "WAITING",
-      );
-
-      const homeStarters = simulatedHome.starters.map((p) => ({
-        ...p,
-        rating: p.baseRating
-          ? Math.max(
-              1.0,
-              parseFloat((p.baseRating - (p.totalRants || 0) * 0.2).toFixed(1)),
-            )
-          : p.baseRating,
-      }));
-      const awayStarters = simulatedAway.starters.map((p) => ({
-        ...p,
-        rating: p.baseRating
-          ? Math.max(
-              1.0,
-              parseFloat((p.baseRating - (p.totalRants || 0) * 0.2).toFixed(1)),
-            )
-          : p.baseRating,
-      }));
-
-      setHomePlayers(homeStarters);
-      setAwayPlayers(awayStarters);
+      setHomePlayers([]);
+      setAwayPlayers([]);
       setHomeBench([]);
       setAwayBench([]);
-      loadPlayerPhotos(homeStarters, setHomePlayers);
-      loadPlayerPhotos(awayStarters, setAwayPlayers);
     } finally {
       setLoading(false);
     }
@@ -1624,9 +1570,11 @@ export default function MatchZone({ matchId, onBack, userProfile, userId }) {
           !isLineupReady() ? (
             <div className="lineup-not-ready-container" style={{ padding: '40px 16px', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '16px', background: 'var(--color-bg)', minHeight: '300px' }}>
               <span style={{ fontSize: '3rem' }}>⏳</span>
-              <h3 style={{ fontSize: '1.2rem', fontWeight: '800', color: 'var(--text-primary)' }}>ترکیب تیم‌ها هنوز مشخص نشده است</h3>
-              <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', maxWidth: '280px', lineHeight: '1.5' }}>
-                ترکیب اصلی تیم‌ها ۱ ساعت قبل از شروع رسمی بازی اعلام و در این صفحه نمایش داده خواهد شد.
+              <h3 style={{ fontSize: '1.25rem', fontWeight: '800', color: 'var(--text-primary)' }}>هنوز لیست رسمی اعلام نشده است</h3>
+              <p style={{ fontSize: '0.95rem', color: 'var(--text-secondary)', maxWidth: '280px', lineHeight: '1.6' }}>
+                بنجلا منتظرن ببینن کی میره تو زمین! 🏟️
+                <br />
+                (معمولاً ۱ ساعت قبل از شروع بازی ترکیب نهایی اعلام میشه)
               </p>
             </div>
           ) : (
