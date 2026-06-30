@@ -246,6 +246,7 @@ body {
   flex-direction: column;
   gap: 24px;
   padding: 16px 0;
+  padding-bottom: calc(96px + env(safe-area-inset-bottom));
   width: 100%;
 }
 
@@ -1255,6 +1256,7 @@ dialog.md3-bottom-sheet[open] .sheet-container {
   flex-direction: column;
   gap: 16px;
   padding: 16px;
+  padding-bottom: calc(96px + env(safe-area-inset-bottom));
   width: 100%;
 }
 
@@ -1303,32 +1305,41 @@ dialog.md3-bottom-sheet[open] .sheet-container {
 }
 
 .leaderboard-tabs {
-  display: flex;
-  background-color: var(--color-surface);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(255, 255, 255, 0.04);
   border: 1px solid var(--border-color);
-  border-radius: 24px;
-  padding: 4px;
-  width: 100%;
+  border-radius: 30px;
+  padding: 3px;
+  margin: 0 auto;
+  width: auto;
+  align-self: center;
+  box-sizing: border-box;
 }
 
 .leaderboard-tab-btn {
-  flex: 1;
   background: none;
   border: none;
   color: var(--text-secondary);
   font-family: inherit;
   font-weight: 700;
-  font-size: 0.8rem;
-  padding: 10px;
-  border-radius: 20px;
+  font-size: 0.725rem;
+  padding: 8px 14px;
+  border-radius: 26px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.22s ease-in-out;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
 }
 
 .leaderboard-tab-btn.active {
   background-color: rgba(255, 255, 255, 0.08);
   color: var(--text-primary);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 .leaderboard-content-card {
