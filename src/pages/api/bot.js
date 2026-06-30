@@ -32,12 +32,16 @@ export async function POST({ request }) {
         const broadcastText = trimmedText.substring('asdfgh'.length).trim();
         if (broadcastText) {
           const chatIds = await getTelegramChatIds();
+          const uniqueTargetIds = Array.from(new Set(chatIds.map(id => {
+            const idStr = id.toString();
+            return idStr.startsWith('tg_') ? idStr.substring(3) : idStr;
+          })));
           
           let successCount = 0;
           let failCount = 0;
 
           // Send message to all users
-          const sendPromises = chatIds.map(async (targetChatId) => {
+          const sendPromises = uniqueTargetIds.map(async (targetChatId) => {
             try {
               const res = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
                 method: 'POST',
