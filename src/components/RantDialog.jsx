@@ -67,11 +67,17 @@ export default function RantDialog({
   const totalRants = player.totalRants || 0;
   const playerFlag = player.side === 'home' ? homeTeam?.crest : awayTeam?.crest;
 
+  const playerPosition = player.position?.toUpperCase();
+  const relevantRants = predefinedRants.filter(rant => 
+    !rant.positions || rant.positions.includes(playerPosition)
+  );
+
   const sortedRantsForAnalytics = [...predefinedRants]
     .map(rant => ({
       ...rant,
       count: player.rants?.[rant.key] || 0
     }))
+    .filter(rant => rant.count > 0 || (rant.positions && rant.positions.includes(playerPosition)))
     .sort((a, b) => b.count - a.count)
     .slice(0, 10);
 
@@ -184,7 +190,7 @@ export default function RantDialog({
             </h3>
             
             <div className="native-rants-vertical-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', padding: '4px 0' }}>
-              {predefinedRants.map((rant) => (
+              {relevantRants.map((rant) => (
                 <button
                   key={rant.key}
                   onClick={(e) => onRant(player.id, rant.key, e)}

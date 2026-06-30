@@ -1954,6 +1954,12 @@ dialog.md3-bottom-sheet[open] .sheet-container {
   padding: 6px 0;
   animation: scaleUp 0.2s ease-out forwards;
   width: 100%;
+  transition: opacity 0.4s ease, filter 0.4s ease;
+}
+
+.rant-feed-item.sending {
+  opacity: 0.55;
+  filter: grayscale(20%);
 }
 
 .rant-feed-avatar-wrapper {

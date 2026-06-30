@@ -83,18 +83,48 @@ const fetchPlayerPhoto = async (playerName) => {
   }
 };
 
-// Predefined list of Persian football rants
+// Predefined list of Persian football rants with position tags
 const PREDEFINED_RANTS = [
-  { key: "pass", persianText: "پاس بده دیگه! ⚽" },
-  { key: "shoot", persianText: "چرا شوت نمیزنی؟ 😤" },
-  { key: "dribble", persianText: "مگه مجبوری دریبل بزنی؟ 👟" },
-  { key: "miss", persianText: "دروازه خالی رو گل نکرد! 🤦‍♂️" },
-  { key: "lazy", persianText: "داره قدم میزنه! 🚶" },
-  { key: "defense", persianText: "دفاع سوراخ! 🕳️" },
-  { key: "sub", persianText: "مربی تعویضش کن! 🔄" },
-  { key: "sleep", persianText: "اصلا تو باغ نیست! 🌳" },
-  { key: "lose", persianText: "توپ لو دادن تخصصشه! 📉" },
-  { key: "slow", persianText: "کند مثل حلزون! 🐌" },
+  // General Rants
+  { key: "wild", persianText: "مرتیکه وحشی! 😠", positions: ["GOALKEEPER", "DEFENDER", "MIDFIELDER", "FORWARD"] },
+  { key: "clumsy", persianText: "این پاش به اون پاش میگه زکی! 🦶", positions: ["DEFENDER", "MIDFIELDER", "FORWARD"] },
+  { key: "sleep", persianText: "اصلا تو باغ نیست! 🌳", positions: ["GOALKEEPER", "DEFENDER", "MIDFIELDER", "FORWARD"] },
+  { key: "lazy", persianText: "داره قدم میزنه! 🚶", positions: ["DEFENDER", "MIDFIELDER", "FORWARD"] },
+  { key: "sub", persianText: "مربی تعویضش کن! 🔄", positions: ["GOALKEEPER", "DEFENDER", "MIDFIELDER", "FORWARD"] },
+
+  // Pass, Cross & Header (General outfield positions)
+  { key: "pass", persianText: "پاس بده دیگه! ⚽", positions: ["DEFENDER", "MIDFIELDER", "FORWARD"] },
+  { key: "bad_pass_angry", persianText: "این چه پاسیه آخه؟ 🤬", positions: ["DEFENDER", "MIDFIELDER", "FORWARD"] },
+  { key: "bad_cross", persianText: "سانت‌هات بخوره تو سرت! 🎯", positions: ["DEFENDER", "MIDFIELDER", "FORWARD"] },
+  { key: "bad_cross_bald", persianText: "ملت رو با این سانتات کچل کردی! 💇‍♂️", positions: ["DEFENDER", "MIDFIELDER", "FORWARD"] },
+  { key: "bad_head", persianText: "سر زدن هم بلد نیستی؟ 🗣️", positions: ["DEFENDER", "MIDFIELDER", "FORWARD"] },
+  { key: "bad_head_knee", persianText: "با سر زد یا با زانو؟ 🤦", positions: ["DEFENDER", "MIDFIELDER", "FORWARD"] },
+
+  // Goalkeeper Specific
+  { key: "gk_highway", persianText: "اتوبان باز کرده واسه حریف! 🛣️", positions: ["GOALKEEPER"] },
+  { key: "gk_easy_goal", persianText: "زاویه بسته رو چطور خوردی؟ 🥅", positions: ["GOALKEEPER"] },
+  { key: "gk_tunnel", persianText: "لایی خوردن تخصصشه! 🥚", positions: ["GOALKEEPER"] },
+  { key: "gk_dry_wood", persianText: "چرا مثل چوب خشک وایسادی؟ 🪵", positions: ["GOALKEEPER"] },
+  { key: "gk_hole_glove", persianText: "دستکشت سوراخه؟ 🧤", positions: ["GOALKEEPER"] },
+
+  // Defender Specific
+  { key: "defense", persianText: "دفاع سوراخ! 🕳️", positions: ["DEFENDER"] },
+  { key: "def_highway", persianText: "دفاع اتوبانی! 🚗", positions: ["DEFENDER"] },
+  { key: "def_left_behind", persianText: "جا موند مثل چی! 🏃‍♂️💨", positions: ["DEFENDER"] },
+  { key: "def_no_marking", persianText: "یارگیری بلد نیست! 👥", positions: ["DEFENDER"] },
+
+  // Midfielder Specific
+  { key: "mid_carrot", persianText: "هافبک نیست، هویجه! 🥕", positions: ["MIDFIELDER"] },
+  { key: "mid_highway", persianText: "وسط زمین اتوبان شده! 🛣️", positions: ["MIDFIELDER"] },
+  { key: "mid_no_creativity", persianText: "یک پاس خلاقانه نمیتونه بده! 🧠❌", positions: ["MIDFIELDER"] },
+  { key: "lose", persianText: "توپ لو دادن تخصصشه! 📉", positions: ["MIDFIELDER", "FORWARD"] },
+
+  // Forward Specific
+  { key: "miss", persianText: "دروازه خالی رو گل نکرد! 🤦‍♂️", positions: ["FORWARD"] },
+  { key: "shoot", persianText: "چرا شوت نمیزنی؟ 😤", positions: ["FORWARD"] },
+  { key: "dribble", persianText: "مگه مجبوری دریبل بزنی؟ 👟", positions: ["FORWARD"] },
+  { key: "slow", persianText: "کند مثل حلزون! 🐌", positions: ["FORWARD"] },
+  { key: "fwd_offside", persianText: "آفساید‌نشین حرفه‌ای! 🚩", positions: ["FORWARD"] }
 ];
 
 // Helper to generate a generic 11-player lineup if API squad details are unavailable
@@ -242,6 +272,11 @@ export default function MatchZone({ matchId, onBack, userProfile, userId }) {
   const lastRainTime = useRef(0);
   const [chatInput, setChatInput] = useState("");
   const [utcDate, setUtcDate] = useState(null);
+
+  const userIdRef = useRef(userId);
+  useEffect(() => {
+    userIdRef.current = userId;
+  }, [userId]);
 
   // Teams State
   const [homeTeam, setHomeTeam] = useState({
@@ -804,11 +839,37 @@ export default function MatchZone({ matchId, onBack, userProfile, userId }) {
 
       // Update rant history feed
       setRantHistory(prev => {
-        const existingIds = new Set(prev.map(r => r.id));
-        const filteredNew = newRants.filter(r => !existingIds.has(r.id));
-        if (filteredNew.length === 0) return prev;
-        const combined = [...prev, ...filteredNew];
-        return combined.sort((a, b) => a.timestamp - b.timestamp).slice(-100);
+        const updatedPrev = [...prev];
+        const currentUserId = userIdRef.current;
+
+        newRants.forEach(r => {
+          // Check if this ID already exists in the history to avoid duplicates
+          if (updatedPrev.some(msg => msg.id === r.id)) {
+            return;
+          }
+
+          // If it's a message sent by the current user, try to match it with an optimistic temporary message
+          if (r.userId && r.userId === currentUserId) {
+            const tempIdx = updatedPrev.findIndex(msg => 
+              typeof msg.id === 'string' &&
+              msg.id.startsWith('temp_') &&
+              msg.rantKey === r.rantKey &&
+              (msg.playerId || null) === (r.playerId || null) &&
+              Math.abs(msg.timestamp - r.timestamp) < 15000
+            );
+
+            if (tempIdx !== -1) {
+              // Replace the temporary message with the actual message from the server
+              updatedPrev[tempIdx] = r;
+              return;
+            }
+          }
+
+          // Otherwise, just append the new message
+          updatedPrev.push(r);
+        });
+
+        return updatedPrev.sort((a, b) => a.timestamp - b.timestamp).slice(-100);
       });
 
       // Roster player rants updates
@@ -1677,9 +1738,10 @@ export default function MatchZone({ matchId, onBack, userProfile, userId }) {
                     const isEmoji = rant.userAvatar && defaultEmojis.includes(rant.userAvatar);
                     const rantText = PREDEFINED_RANTS.find(r => r.key === rant.rantKey)?.persianText || rant.rantKey;
                     const isMyMessage = rant.userId === userId;
+                    const isSending = typeof rant.id === 'string' && rant.id.startsWith('temp_');
                     
                     return (
-                      <div key={rant.id} className={`rant-feed-item ${isMyMessage ? 'my-message' : ''}`}>
+                      <div key={rant.id} className={`rant-feed-item ${isMyMessage ? 'my-message' : ''} ${isSending ? 'sending' : ''}`}>
                         <div className="rant-feed-avatar-wrapper">
                           {!rant.userAvatar ? (
                             <div className="rant-feed-avatar initials">{rant.userName ? rant.userName.trim().charAt(0) : '👤'}</div>
