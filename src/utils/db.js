@@ -86,6 +86,32 @@ export async function initDb() {
         await redisClient.rename('rants_db', 'rants_db:migrated');
         console.log("[Migration] Database migration completed successfully!");
       }
+
+      // 2. Migrate existing user profiles to the new telegram_chat_ids Set
+      const migratedKey = 'migration:telegram_chat_ids_populated';
+      const alreadyMigrated = await redisClient.get(migratedKey);
+      if (!alreadyMigrated) {
+        console.log("[Migration] Populating telegram_chat_ids Set from existing user profiles...");
+        let cursor = '0';
+        const userIds = [];
+        do {
+          const [nextCursor, keys] = await redisClient.scan(cursor, 'MATCH', 'user_profile:*', 'COUNT', 100);
+          cursor = nextCursor;
+          for (const key of keys) {
+            const userId = key.replace('user_profile:', '');
+            if (userId) {
+              userIds.push(userId);
+            }
+          }
+        } while (cursor !== '0');
+
+        if (userIds.length > 0) {
+          // Add them all to the set
+          await redisClient.sadd('telegram_chat_ids', ...userIds);
+          console.log(`[Migration] Successfully added ${userIds.length} existing user IDs to telegram_chat_ids Set.`);
+        }
+        await redisClient.set(migratedKey, '1');
+      }
     } catch (err) {
       console.error("[Migration] Failed during legacy Redis migration:", err);
     }
@@ -700,4 +726,32 @@ export async function setPrediction(userId, matchId, playerId) {
   } else {
     globalThis.userPredictions[`${userId}:${matchId}`] = playerId;
   }
+}
+
+export async function saveTelegramChatId(chatId) {
+  if (!chatId) return;
+  const idStr = chatId.toString();
+  if (hasRedis && redisClient) {
+    try {
+      await redisClient.sadd('telegram_chat_ids', idStr);
+    } catch (e) {
+      console.error("Failed to save telegram chat ID in Redis:", e);
+    }
+  }
+  if (!globalThis.telegramChatIds) globalThis.telegramChatIds = new Set();
+  globalThis.telegramChatIds.add(idStr);
+}
+
+export async function getTelegramChatIds() {
+  if (hasRedis && redisClient) {
+    try {
+      const ids = await redisClient.smembers('telegram_chat_ids');
+      return ids || [];
+    } catch (e) {
+      console.error("Failed to get telegram chat IDs from Redis:", e);
+      return [];
+    }
+  }
+  if (!globalThis.telegramChatIds) globalThis.telegramChatIds = new Set();
+  return Array.from(globalThis.telegramChatIds);
 }
