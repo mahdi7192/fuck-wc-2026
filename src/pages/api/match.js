@@ -49,7 +49,7 @@ const getSimulatedMatchState = () => {
 const SIMULATED_HOME_TEAM = {
   id: "iran",
   name: "Iran",
-  crest: "https://a.espncdn.com/i/teamlogos/soccer/500/374.png",
+  crest: "https://a.espncdn.com/i/teamlogos/countries/500/irn.png",
   lineup: [
     { id: "iran_1", name: "Alireza Beiranvand", position: "GOALKEEPER", shirtNumber: 1, photoUrl: "https://a.espncdn.com/i/headshots/soccer/players/full/299061.png" },
     { id: "iran_2", name: "Ramin Rezaeian", position: "DEFENDER", shirtNumber: 23, photoUrl: "" },
@@ -74,7 +74,7 @@ const SIMULATED_HOME_TEAM = {
 const SIMULATED_AWAY_TEAM = {
   id: "usa",
   name: "USA",
-  crest: "https://a.espncdn.com/i/teamlogos/soccer/500/660.png",
+  crest: "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
   lineup: [
     { id: "usa_1", name: "Matt Turner", position: "GOALKEEPER", shirtNumber: 1, photoUrl: "" },
     { id: "usa_2", name: "Sergino Dest", position: "DEFENDER", shirtNumber: 2, photoUrl: "" },

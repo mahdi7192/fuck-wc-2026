@@ -1696,6 +1696,44 @@ export default function MatchZone({ matchId, onBack, userProfile, userId }) {
     );
   }
 
+  if (apiError && !homePlayers.length) {
+    return (
+      <div
+        className="matches-error-container"
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          minHeight: "300px",
+          gap: "16px",
+          padding: "24px",
+          textAlign: "center",
+        }}
+      >
+        <div
+          className="settings-error"
+          style={{
+            textAlign: "center",
+            padding: "16px",
+            fontSize: "1rem",
+            fontWeight: "700",
+          }}
+        >
+          ⚠️ {apiError}
+        </div>
+        <button
+          onClick={handleFetchRealMatch}
+          className="md3-btn md3-btn-filled-primary"
+          style={{ padding: "8px 16px" }}
+        >
+          تلاش مجدد
+        </button>
+      </div>
+    );
+  }
+
+
   return (
     <div className="match-zone-container" style={{ display: 'flex', flexDirection: 'column', height: '100%', width: '100%', overflow: 'hidden' }}>
       {/* Falling Emoji Rain */}

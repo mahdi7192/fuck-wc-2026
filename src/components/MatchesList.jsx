@@ -59,9 +59,10 @@ export default function MatchesList({ onSelectMatch }) {
     );
   }
 
-  const liveMatches = matches.filter(m => m.status === 'LIVE');
-  const upcomingMatches = matches.filter(m => m.status === 'WAITING');
-  const finishedMatches = matches.filter(m => m.status === 'FINISHED');
+  const liveMatches = matches.filter(m => m.status === 'LIVE' && !m.isTest);
+  const upcomingMatches = matches.filter(m => m.status === 'WAITING' && !m.isTest);
+  const finishedMatches = matches.filter(m => m.status === 'FINISHED' && !m.isTest);
+  const testMatches = matches.filter(m => m.isTest);
 
   const renderMatchCard = (match) => {
     const isLive = match.status === 'LIVE';
@@ -152,6 +153,16 @@ export default function MatchesList({ onSelectMatch }) {
           <h2 className="matches-section-title">🏁 بازی‌های خاتمه‌یافته</h2>
           <div className="matches-grid">
             {finishedMatches.map(renderMatchCard)}
+          </div>
+        </div>
+      )}
+
+      {/* 4. TEST MATCHES */}
+      {testMatches.length > 0 && (
+        <div className="matches-section animate-slide-in" style={{ animationDelay: '0.3s' }}>
+          <h2 className="matches-section-title">🧪 مسابقه تست (شبیه‌سازی)</h2>
+          <div className="matches-grid">
+            {testMatches.map(renderMatchCard)}
           </div>
         </div>
       )}
