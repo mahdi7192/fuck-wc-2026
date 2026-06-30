@@ -341,21 +341,22 @@ export default function AppShell() {
         display: 'flex', 
         flexDirection: 'column', 
         flex: 1, 
+        minHeight: 0,
         width: '100%', 
         overflowY: activeMatchId ? 'hidden' : 'auto', 
         WebkitOverflowScrolling: 'touch',
         paddingBottom: !activeMatchId ? '80px' : '0' 
       }}>
         {activeMatchId ? (
-          <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', flex: 1, width: '100%' }}>
+          <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, width: '100%' }}>
             <MatchZone matchId={activeMatchId} onBack={handleBack} userProfile={userProfile} userId={userId} />
           </div>
         ) : activeTab === 'matches' ? (
-          <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', flex: 1, width: '100%' }}>
+          <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, width: '100%' }}>
             <MatchesList onSelectMatch={navigateToMatch} />
           </div>
         ) : (
-          <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', flex: 1, width: '100%' }}>
+          <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, width: '100%' }}>
             <Leaderboard />
           </div>
         )}
