@@ -304,6 +304,7 @@ export default function MatchZone({ matchId, onBack, userProfile, userId }) {
   });
   const [matchMinutes, setMatchMinutes] = useState(0);
   const [matchScore, setMatchScore] = useState({ home: 0, away: 0 });
+  const [isTestMatch, setIsTestMatch] = useState(false);
 
   // Players State
   const [homePlayers, setHomePlayers] = useState([]);
@@ -565,7 +566,11 @@ export default function MatchZone({ matchId, onBack, userProfile, userId }) {
       homeTeamName === "Germany" ||
       homeTeamName === "آلمان" ||
       awayTeamName === "Germany" ||
-      awayTeamName === "آلمان";
+      awayTeamName === "آلمان" ||
+      homeTeamName === "Iran" ||
+      homeTeamName === "ایران" ||
+      awayTeamName === "Iran" ||
+      awayTeamName === "ایران";
 
     // 1. Determine which bench players are subbed in
     const updatedBench = bench.map((p, idx) => {
@@ -573,7 +578,7 @@ export default function MatchZone({ matchId, onBack, userProfile, userId }) {
       if (isLiveOrFinished) {
         if (isGermanyMatch) {
           if (isHome) {
-            if (p.name.includes("Undav") || p.name.includes("دنیز اونداو")) {
+            if (p.name.includes("Undav") || p.name.includes("دنیز اونداو") || p.name.includes("Ghayedi") || p.name.includes("قایدی")) {
               subbedInMin = 72;
             } else if (idx === 1) { // Leroy Sane
               subbedInMin = 60;
@@ -681,8 +686,8 @@ export default function MatchZone({ matchId, onBack, userProfile, userId }) {
     if (isLiveOrFinished && teamScore > 0) {
       if (isGermanyMatch) {
         const isGermanyTeam =
-          (isHome && homeTeamName === "Germany") ||
-          (!isHome && awayTeamName === "Germany");
+          (isHome && (homeTeamName === "Germany" || homeTeamName === "Iran" || homeTeamName === "ایران")) ||
+          (!isHome && (awayTeamName === "Germany" || awayTeamName === "Iran" || awayTeamName === "ایران"));
         if (isGermanyTeam) {
           let goalsAssigned = 0;
           const targetScorers = [
@@ -690,6 +695,10 @@ export default function MatchZone({ matchId, onBack, userProfile, userId }) {
             { name: "Musiala", max: 2 },
             { name: "Nmecha", max: 1 },
             { name: "Undav", max: 1 },
+            { name: "Taremi", max: 2 },
+            { name: "Azmoun", max: 2 },
+            { name: "Ghayedi", max: 1 },
+            { name: "Jahanbakhsh", max: 1 },
           ];
 
           for (const target of targetScorers) {
@@ -719,9 +728,14 @@ export default function MatchZone({ matchId, onBack, userProfile, userId }) {
           if (locadia) {
             locadia.goals = teamScore;
           } else {
-            const forward =
-              allPlayers.find((p) => p.position === "FORWARD") || allPlayers[0];
-            if (forward) forward.goals = teamScore;
+            const pulisic = allPlayers.find((p) => p.name.includes("Pulisic"));
+            if (pulisic) {
+              pulisic.goals = teamScore;
+            } else {
+              const forward =
+                allPlayers.find((p) => p.position === "FORWARD") || allPlayers[0];
+              if (forward) forward.goals = teamScore;
+            }
           }
         }
       } else {
@@ -1205,6 +1219,7 @@ export default function MatchZone({ matchId, onBack, userProfile, userId }) {
         home: selectedMatch.score.home,
         away: selectedMatch.score.away,
       });
+      setIsTestMatch(selectedMatch.isTest || false);
 
       const isLive = selectedMatch.status === "LIVE";
       const isFinished = selectedMatch.status === "FINISHED";
@@ -1756,17 +1771,23 @@ export default function MatchZone({ matchId, onBack, userProfile, userId }) {
             </div>
           </div>
 
-          {/* Below: Minute */}
-          <div
-            className={`native-scoreboard-status ${matchStatus === "LIVE" ? "live" : ""}`}
-          >
-            {matchStatus === "LIVE"
-              ? (matchMinutes === "HT" || matchMinutes === "بین نیمه" || /HT/i.test(String(matchMinutes)))
-                ? "بین نیمه"
-                : `دقیقه ${matchMinutes}'`
-              : matchStatus === "WAITING"
-                ? "شروع نشده"
-                : "پایان مسابقه"}
+          {/* Below: Minute & Optional Test Badge */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginTop: '8px' }}>
+            {isTestMatch && (
+              <span className="native-test-badge" style={{ margin: 0 }}>تست</span>
+            )}
+            <div
+              className={`native-scoreboard-status ${matchStatus === "LIVE" ? "live" : ""}`}
+              style={{ marginTop: 0 }}
+            >
+              {matchStatus === "LIVE"
+                ? (matchMinutes === "HT" || matchMinutes === "بین نیمه" || /HT/i.test(String(matchMinutes)))
+                  ? "بین نیمه"
+                  : `دقیقه ${matchMinutes}'`
+                : matchStatus === "WAITING"
+                  ? "شروع نشده"
+                  : "پایان مسابقه"}
+            </div>
           </div>
         </div>
 

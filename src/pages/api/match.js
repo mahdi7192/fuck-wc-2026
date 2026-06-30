@@ -47,51 +47,52 @@ const getSimulatedMatchState = () => {
 };
 
 const SIMULATED_HOME_TEAM = {
-  id: "germany",
-  name: "Germany",
-  crest: "https://a.espncdn.com/i/teamlogos/soccer/500/381.png",
+  id: "iran",
+  name: "Iran",
+  crest: "https://a.espncdn.com/i/teamlogos/soccer/500/374.png",
   lineup: [
-    { id: "128174", name: "Marc-André ter Stegen", position: "GOALKEEPER", shirtNumber: 1, photoUrl: "https://a.espncdn.com/i/headshots/soccer/players/full/128174.png" },
-    { id: "158588", name: "Antonio Rüdiger", position: "DEFENDER", shirtNumber: 2, photoUrl: "https://a.espncdn.com/i/headshots/soccer/players/full/158588.png" },
-    { id: "210257", name: "Jonathan Tah", position: "DEFENDER", shirtNumber: 4, photoUrl: "https://a.espncdn.com/i/headshots/soccer/players/full/210257.png" },
-    { id: "298495", name: "David Raum", position: "DEFENDER", shirtNumber: 3, photoUrl: "https://a.espncdn.com/i/headshots/soccer/players/full/298495.png" },
-    { id: "240673", name: "Joshua Kimmich", position: "DEFENDER", shirtNumber: 6, photoUrl: "https://a.espncdn.com/i/headshots/soccer/players/full/240673.png" },
-    { id: "151368", name: "Pascal Groß", position: "MIDFIELDER", shirtNumber: 5, photoUrl: "https://a.espncdn.com/i/headshots/soccer/players/full/151368.png" },
-    { id: "242207", name: "Robert Andrich", position: "MIDFIELDER", shirtNumber: 8, photoUrl: "https://a.espncdn.com/i/headshots/soccer/players/full/242207.png" },
-    { id: "257321", name: "Felix Nmecha", position: "MIDFIELDER", shirtNumber: 16, photoUrl: "https://a.espncdn.com/i/headshots/soccer/players/full/257321.png" },
-    { id: "296716", name: "Jamal Musiala", position: "MIDFIELDER", shirtNumber: 10, photoUrl: "https://a.espncdn.com/i/headshots/soccer/players/full/296716.png" },
-    { id: "279288", name: "Kai Havertz", position: "FORWARD", shirtNumber: 7, photoUrl: "https://a.espncdn.com/i/headshots/soccer/players/full/279288.png" },
-    { id: "304388", name: "Florian Wirtz", position: "FORWARD", shirtNumber: 17, photoUrl: "https://a.espncdn.com/i/headshots/soccer/players/full/304388.png" }
+    { id: "iran_1", name: "Alireza Beiranvand", position: "GOALKEEPER", shirtNumber: 1, photoUrl: "https://a.espncdn.com/i/headshots/soccer/players/full/299061.png" },
+    { id: "iran_2", name: "Ramin Rezaeian", position: "DEFENDER", shirtNumber: 23, photoUrl: "" },
+    { id: "iran_3", name: "Hossein Kanaanizadegan", position: "DEFENDER", shirtNumber: 13, photoUrl: "" },
+    { id: "iran_4", name: "Shojae Khalilzadeh", position: "DEFENDER", shirtNumber: 4, photoUrl: "" },
+    { id: "iran_5", name: "Milad Mohammadi", position: "DEFENDER", shirtNumber: 5, photoUrl: "" },
+    { id: "iran_6", name: "Saeid Ezatolahi", position: "MIDFIELDER", shirtNumber: 6, photoUrl: "" },
+    { id: "iran_7", name: "Omid Noorafkan", position: "MIDFIELDER", shirtNumber: 21, photoUrl: "" },
+    { id: "iran_8", name: "Saman Ghoddos", position: "MIDFIELDER", shirtNumber: 14, photoUrl: "" },
+    { id: "iran_9", name: "Alireza Jahanbakhsh", position: "FORWARD", shirtNumber: 7, photoUrl: "" },
+    { id: "iran_10", name: "Mehdi Taremi", position: "FORWARD", shirtNumber: 9, photoUrl: "" },
+    { id: "iran_11", name: "Sardar Azmoun", position: "FORWARD", shirtNumber: 20, photoUrl: "" }
   ],
   bench: [
-    { id: "305541", name: "Deniz Undav", position: "FORWARD", shirtNumber: 20, photoUrl: "https://a.espncdn.com/i/headshots/soccer/players/full/305541.png" },
-    { id: "203403", name: "Leroy Sané", position: "FORWARD", shirtNumber: 19, photoUrl: "https://a.espncdn.com/i/headshots/soccer/players/full/203403.png" },
-    { id: "201198", name: "Niclas Füllkrug", position: "FORWARD", shirtNumber: 9, photoUrl: "https://a.espncdn.com/i/headshots/soccer/players/full/201198.png" },
-    { id: "286829", name: "Nico Schlotterbeck", position: "DEFENDER", shirtNumber: 15, photoUrl: "https://a.espncdn.com/i/headshots/soccer/players/full/286829.png" }
+    { id: "iran_12", name: "Payam Niazmand", position: "GOALKEEPER", shirtNumber: 12, photoUrl: "" },
+    { id: "iran_13", name: "Rouzbeh Cheshmi", position: "DEFENDER", shirtNumber: 15, photoUrl: "" },
+    { id: "iran_14", name: "Mehdi Ghayedi", position: "FORWARD", shirtNumber: 18, photoUrl: "" },
+    { id: "iran_15", name: "Ali Gholizadeh", position: "MIDFIELDER", shirtNumber: 17, photoUrl: "" }
   ]
 };
 
 const SIMULATED_AWAY_TEAM = {
-  id: "curacao",
-  name: "Curaçao",
-  crest: "https://a.espncdn.com/i/teamlogos/soccer/500/6900.png",
+  id: "usa",
+  name: "USA",
+  crest: "https://a.espncdn.com/i/teamlogos/soccer/500/660.png",
   lineup: [
-    { id: "147983", name: "Eloy Room", position: "GOALKEEPER", shirtNumber: 1, photoUrl: "https://a.espncdn.com/i/headshots/soccer/players/full/147983.png" },
-    { id: "160759", name: "Cuco Martina", position: "DEFENDER", shirtNumber: 2, photoUrl: "https://a.espncdn.com/i/headshots/soccer/players/full/160759.png" },
-    { id: "221590", name: "Jurich Carolina", position: "DEFENDER", shirtNumber: 4, photoUrl: "https://a.espncdn.com/i/headshots/soccer/players/full/221590.png" },
-    { id: "220803", name: "Sherel Floranus", position: "DEFENDER", shirtNumber: 3, photoUrl: "https://a.espncdn.com/i/headshots/soccer/players/full/220803.png" },
-    { id: "305719", name: "Roshon van Eijma", position: "DEFENDER", shirtNumber: 5, photoUrl: "https://a.espncdn.com/i/headshots/soccer/players/full/305719.png" },
-    { id: "103597", name: "Vurnon Anita", position: "MIDFIELDER", shirtNumber: 6, photoUrl: "https://a.espncdn.com/i/headshots/soccer/players/full/103597.png" },
-    { id: "132646", name: "Leandro Bacuna", position: "MIDFIELDER", shirtNumber: 7, photoUrl: "https://a.espncdn.com/i/headshots/soccer/players/full/132646.png" },
-    { id: "219503", name: "Juninho Bacuna", position: "MIDFIELDER", shirtNumber: 10, photoUrl: "https://a.espncdn.com/i/headshots/soccer/players/full/219503.png" },
-    { id: "230678", name: "Brandley Kuwas", position: "MIDFIELDER", shirtNumber: 8, photoUrl: "https://a.espncdn.com/i/headshots/soccer/players/full/230678.png" },
-    { id: "172553", name: "Jürgen Locadia", position: "FORWARD", shirtNumber: 9, photoUrl: "https://a.espncdn.com/i/headshots/soccer/players/full/172553.png" },
-    { id: "186835", name: "Rangelo Janga", position: "FORWARD", shirtNumber: 11, photoUrl: "https://a.espncdn.com/i/headshots/soccer/players/full/186835.png" }
+    { id: "usa_1", name: "Matt Turner", position: "GOALKEEPER", shirtNumber: 1, photoUrl: "" },
+    { id: "usa_2", name: "Sergino Dest", position: "DEFENDER", shirtNumber: 2, photoUrl: "" },
+    { id: "usa_3", name: "Walker Zimmerman", position: "DEFENDER", shirtNumber: 3, photoUrl: "" },
+    { id: "usa_4", name: "Tim Ream", position: "DEFENDER", shirtNumber: 13, photoUrl: "" },
+    { id: "usa_5", name: "Antonee Robinson", position: "DEFENDER", shirtNumber: 5, photoUrl: "" },
+    { id: "usa_6", name: "Tyler Adams", position: "MIDFIELDER", shirtNumber: 4, photoUrl: "" },
+    { id: "usa_7", name: "Yunus Musah", position: "MIDFIELDER", shirtNumber: 6, photoUrl: "" },
+    { id: "usa_8", name: "Weston McKennie", position: "MIDFIELDER", shirtNumber: 8, photoUrl: "" },
+    { id: "usa_9", name: "Christian Pulisic", position: "FORWARD", shirtNumber: 10, photoUrl: "" },
+    { id: "usa_10", name: "Timothy Weah", position: "FORWARD", shirtNumber: 11, photoUrl: "" },
+    { id: "usa_11", name: "Folarin Balogun", position: "FORWARD", shirtNumber: 20, photoUrl: "" }
   ],
   bench: [
-    { id: "200236", name: "Kenji Gorré", position: "FORWARD", shirtNumber: 14, photoUrl: "https://a.espncdn.com/i/headshots/soccer/players/full/200236.png" },
-    { id: "204278", name: "Jafar Arias", position: "FORWARD", shirtNumber: 19, photoUrl: "https://a.espncdn.com/i/headshots/soccer/players/full/204278.png" },
-    { id: "200156", name: "Gervane Kastaneer", position: "FORWARD", shirtNumber: 17, photoUrl: "https://a.espncdn.com/i/headshots/soccer/players/full/200156.png" }
+    { id: "usa_12", name: "Ethan Horvath", position: "GOALKEEPER", shirtNumber: 12, photoUrl: "" },
+    { id: "usa_13", name: "Chris Richards", position: "DEFENDER", shirtNumber: 15, photoUrl: "" },
+    { id: "usa_14", name: "Giovanni Reyna", position: "MIDFIELDER", shirtNumber: 7, photoUrl: "" },
+    { id: "usa_15", name: "Ricardo Pepi", position: "FORWARD", shirtNumber: 9, photoUrl: "" }
   ]
 };
 
@@ -194,6 +195,7 @@ export async function GET({ request }) {
       const simState = getSimulatedMatchState();
       const formattedMatch = {
         id: SIMULATED_MATCH_ID,
+        isTest: true,
         utcDate: new Date().toISOString(),
         status: simState.status,
         elapsed: simState.elapsed,
@@ -492,6 +494,7 @@ export async function GET({ request }) {
       const simState = getSimulatedMatchState();
       const simMatch = {
         id: SIMULATED_MATCH_ID,
+        isTest: true,
         utcDate: new Date().toISOString(),
         status: simState.status,
         elapsed: simState.elapsed,
@@ -506,7 +509,7 @@ export async function GET({ request }) {
         },
         score: simState.score
       };
-      list = [simMatch, ...list.filter(m => m.id !== SIMULATED_MATCH_ID)];
+      list = [...list.filter(m => m.id !== SIMULATED_MATCH_ID), simMatch];
       isError = false; // Reset error state if simulation is successfully appended
     }
 

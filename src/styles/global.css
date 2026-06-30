@@ -2196,3 +2196,19 @@ dialog.md3-bottom-sheet[open] .sheet-container {
   transform: none;
 }
 
+/* Test Match Badge */
+.native-test-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.65rem;
+  font-weight: 800;
+  background-color: rgba(255, 179, 0, 0.12);
+  color: var(--color-warning);
+  border: 1px solid rgba(255, 179, 0, 0.35);
+  padding: 1px 6px;
+  border-radius: 4px;
+  margin-bottom: 4px;
+  line-height: 1.2;
+}
+

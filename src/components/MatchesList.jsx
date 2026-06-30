@@ -81,6 +81,9 @@ export default function MatchesList({ onSelectMatch }) {
 
         {/* Center: Score or VS and Status */}
         <div className="native-match-center">
+          {match.isTest && (
+            <span className="native-test-badge">تست</span>
+          )}
           {isLive || isFinished ? (
             <div className="native-score-box">
               <span className="native-score-num">{match.score.home}</span>
