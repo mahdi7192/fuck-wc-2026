@@ -1,5 +1,5 @@
 export const prerender = false;
-import { getMatchRants, addRant } from '../../utils/db.js';
+import { getMatchRants, addRant, saveMatchDate } from '../../utils/db.js';
 
 // Initialize global variables to store cache in RAM
 globalThis.matchCache = globalThis.matchCache || { matches: null, details: {} };
@@ -261,13 +261,42 @@ export async function GET({ request }) {
       const homeRosterObj = rosters.find(r => r.homeAway === 'home');
       const awayRosterObj = rosters.find(r => r.homeAway === 'away');
 
-      const parseRosterPlayer = (p) => ({
-        id: p.athlete?.id || `player_${p.jersey || Math.floor(Math.random() * 1000)}`,
-        name: p.athlete?.displayName || p.athlete?.fullName || 'بازیکن',
-        position: mapPosition(p.position?.abbreviation, p.position?.name),
-        shirtNumber: parseInt(p.jersey) || 0,
-        photoUrl: p.athlete?.id ? `https://a.espncdn.com/i/headshots/soccer/players/full/${p.athlete.id}.png` : ''
-      });
+      const parseRosterPlayer = (p) => {
+        let subbedIn = false;
+        let subbedInMin = null;
+        if (p.subbedIn === true) {
+          subbedIn = true;
+        } else if (p.subbedIn && typeof p.subbedIn === 'object') {
+          subbedIn = p.subbedIn.didSub === true;
+          if (p.subbedIn.time?.displayClock) {
+            subbedInMin = parseInt(p.subbedIn.time.displayClock) || null;
+          }
+        }
+
+        let subbedOut = false;
+        let subbedOutMin = null;
+        if (p.subbedOut === true) {
+          subbedOut = true;
+        } else if (p.subbedOut && typeof p.subbedOut === 'object') {
+          subbedOut = p.subbedOut.didSub === true;
+          if (p.subbedOut.time?.displayClock) {
+            subbedOutMin = parseInt(p.subbedOut.time.displayClock) || null;
+          }
+        }
+
+        return {
+          id: p.athlete?.id || `player_${p.jersey || Math.floor(Math.random() * 1000)}`,
+          name: p.athlete?.displayName || p.athlete?.fullName || 'بازیکن',
+          position: mapPosition(p.position?.abbreviation, p.position?.name),
+          shirtNumber: parseInt(p.jersey) || 0,
+          photoUrl: p.athlete?.id ? `https://a.espncdn.com/i/headshots/soccer/players/full/${p.athlete.id}.png` : '',
+          starter: p.starter === true,
+          subbedIn,
+          subbedInMin,
+          subbedOut,
+          subbedOutMin
+        };
+      };
 
       if (homeRosterObj && homeRosterObj.roster) {
         homeLineup = homeRosterObj.roster.filter(p => p.starter === true).map(parseRosterPlayer);
@@ -337,6 +366,9 @@ export async function GET({ request }) {
         match: formattedMatch
       };
       saveCache(cache);
+
+      // Proactively save match date persistently
+      await saveMatchDate(matchId, formattedMatch.utcDate);
 
       const matchWithRants = mergeRantsForMatch(formattedMatch);
 
@@ -438,6 +470,11 @@ export async function GET({ request }) {
           list: list
         };
         saveCache(cache);
+
+        // Proactively save all match dates persistently
+        for (const match of list) {
+          await saveMatchDate(match.id, match.utcDate);
+        }
 
       } catch (error) {
         logDebug("Error fetching matches list:", error.message);

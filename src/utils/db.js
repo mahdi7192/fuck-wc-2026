@@ -280,6 +280,22 @@ export async function addRant({ matchId, playerId, playerName, playerPhoto, team
         };
       }
       globalThis.cachedDb.userTotals[userId].totalRants += 1;
+
+      // Save user rants per match in memory
+      if (!globalThis.cachedDb.userMatchTotals) {
+        globalThis.cachedDb.userMatchTotals = {};
+      }
+      if (!globalThis.cachedDb.userMatchTotals[matchId]) {
+        globalThis.cachedDb.userMatchTotals[matchId] = {};
+      }
+      if (!globalThis.cachedDb.userMatchTotals[matchId][userId]) {
+        globalThis.cachedDb.userMatchTotals[matchId][userId] = {
+          totalRants: 0,
+          name: userName || 'تماشاگر ناشناس',
+          avatar: userAvatar || ''
+        };
+      }
+      globalThis.cachedDb.userMatchTotals[matchId][userId].totalRants += 1;
     }
 
     // Emit event locally for SSE stream
@@ -375,6 +391,18 @@ export async function addRant({ matchId, playerId, playerName, playerPhoto, team
       if (userName) uTotal.name = userName;
       if (userAvatar) uTotal.avatar = userAvatar;
       await redisClient.hset('totals:users', userId, JSON.stringify(uTotal));
+
+      // Save user rants per match in Redis
+      const rawUserMatchTotal = await redisClient.hget(`user_rants:${matchId}`, userId);
+      let umTotal = rawUserMatchTotal ? JSON.parse(rawUserMatchTotal) : {
+        totalRants: 0,
+        name: userName || 'تماشاگر ناشناس',
+        avatar: userAvatar || ''
+      };
+      umTotal.totalRants += 1;
+      if (userName) umTotal.name = userName;
+      if (userAvatar) umTotal.avatar = userAvatar;
+      await redisClient.hset(`user_rants:${matchId}`, userId, JSON.stringify(umTotal));
     }
 
     // Publish to Redis Pub/Sub channel and emit locally for SSE
@@ -390,54 +418,221 @@ export async function addRant({ matchId, playerId, playerName, playerPhoto, team
   }
 }
 
+export async function saveMatchDate(matchId, utcDate) {
+  if (!matchId || !utcDate || matchId === 'simulated-match') return;
+  if (hasRedis && redisClient) {
+    try {
+      await redisClient.hset('match_dates', matchId, utcDate);
+    } catch (e) {
+      console.error("Error saving match date to Redis:", e);
+    }
+  } else {
+    if (!globalThis.cachedDb.matchDates) globalThis.cachedDb.matchDates = {};
+    globalThis.cachedDb.matchDates[matchId] = utcDate;
+  }
+}
+
+export async function getMatchDate(matchId) {
+  if (matchId === 'simulated-match') {
+    return new Date().toISOString();
+  }
+
+  if (hasRedis && redisClient) {
+    try {
+      const date = await redisClient.hget('match_dates', matchId);
+      if (date) return date;
+    } catch (e) {
+      console.error("Error reading match date from Redis:", e);
+    }
+  } else {
+    if (globalThis.cachedDb.matchDates && globalThis.cachedDb.matchDates[matchId]) {
+      return globalThis.cachedDb.matchDates[matchId];
+    }
+  }
+
+  // Fallback: fetch from ESPN API
+  try {
+    const res = await fetch(`https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/summary?event=${matchId}`);
+    if (res.ok) {
+      const data = await res.json();
+      const utcDate = data?.header?.competitions?.[0]?.date;
+      if (utcDate) {
+        await saveMatchDate(matchId, utcDate);
+        return utcDate;
+      }
+    }
+  } catch (e) {
+    console.error(`Error fetching match date for ${matchId} from ESPN:`, e);
+  }
+
+  return null;
+}
+
 // 4. Fetch leaderboard metrics
 export async function getLeaderboard() {
-  if (!hasRedis || !redisClient) {
-    const topPlayers = Object.entries(globalThis.cachedDb.totals.players || {})
-      .map(([id, data]) => ({ id, ...data }))
-      .sort((a, b) => b.totalRants - a.totalRants)
-      .slice(0, 10);
+  const CUTOFF_DATE = new Date('2026-06-28T00:00:00Z');
 
-    const topTeams = Object.entries(globalThis.cachedDb.totals.teams || {})
-      .map(([id, data]) => ({ id, ...data }))
-      .sort((a, b) => b.totalRants - a.totalRants)
-      .slice(0, 10);
+  const playerAgg = {}; // playerId -> { id, name, photo, teamId, teamName, totalRants }
+  const teamAgg = {};   // teamId -> { id, name, crest, totalRants }
+  const userAgg = {};   // userId -> { id, name, avatar, totalRants }
 
-    const topUsers = Object.entries(globalThis.cachedDb.userTotals || {})
-      .map(([id, data]) => ({ id, ...data }))
-      .sort((a, b) => b.totalRants - a.totalRants)
-      .slice(0, 10);
-
-    return { players: topPlayers, teams: topTeams, users: topUsers };
+  // 1. Get all match IDs that have rants
+  let matchIds = [];
+  if (hasRedis && redisClient) {
+    try {
+      const keys = await redisClient.keys('match_rants:*');
+      matchIds = keys.map(k => k.replace('match_rants:', ''));
+    } catch (e) {
+      console.error("Error fetching match rants keys from Redis:", e);
+    }
+  } else {
+    matchIds = Object.keys(globalThis.cachedDb.rants || {});
   }
-  
-  try {
-    // Players totals
-    const rawPlayers = await redisClient.hvals('totals:players');
-    const topPlayers = rawPlayers
-      .map(val => JSON.parse(val))
-      .sort((a, b) => b.totalRants - a.totalRants)
-      .slice(0, 10);
 
-    // Teams totals
-    const rawTeams = await redisClient.hvals('totals:teams');
-    const topTeams = rawTeams
-      .map(val => JSON.parse(val))
-      .sort((a, b) => b.totalRants - a.totalRants)
-      .slice(0, 10);
+  // Filter matchIds to only keep matches >= CUTOFF_DATE and not test matches
+  const validMatchIds = [];
+  for (const matchId of matchIds) {
+    if (matchId === 'simulated-match') continue;
 
-    // Users totals
-    const rawUsers = await redisClient.hvals('totals:users');
-    const topUsers = rawUsers
-      .map(val => JSON.parse(val))
-      .sort((a, b) => b.totalRants - a.totalRants)
-      .slice(0, 10);
+    const matchDateStr = await getMatchDate(matchId);
+    if (!matchDateStr) {
+      console.warn(`Could not determine date for match: ${matchId}, skipping.`);
+      continue;
+    }
 
-    return { players: topPlayers, teams: topTeams, users: topUsers };
-  } catch (error) {
-    console.error("Failed to fetch leaderboard from Redis:", error);
-    return { players: [], teams: [], users: [] };
+    const mDate = new Date(matchDateStr);
+    if (mDate >= CUTOFF_DATE) {
+      validMatchIds.push(matchId);
+    }
   }
+
+  // 2. Aggregate player and team rants
+  for (const matchId of validMatchIds) {
+    let rants = {};
+    if (hasRedis && redisClient) {
+      try {
+        const raw = await redisClient.hgetall(`match_rants:${matchId}`);
+        for (const [playerId, val] of Object.entries(raw)) {
+          rants[playerId] = JSON.parse(val);
+        }
+      } catch (e) {
+        console.error(`Error reading match rants for ${matchId}:`, e);
+      }
+    } else {
+      rants = globalThis.cachedDb.rants[matchId] || {};
+    }
+
+    for (const [playerId, data] of Object.entries(rants)) {
+      if (!playerId) continue;
+      // Aggregate Player
+      if (!playerAgg[playerId]) {
+        playerAgg[playerId] = {
+          id: playerId,
+          name: data.playerName || '',
+          photo: data.playerPhoto || '',
+          teamId: data.teamId || '',
+          teamName: data.teamName || '',
+          totalRants: 0
+        };
+      }
+      playerAgg[playerId].totalRants += data.totalRants || 0;
+
+      // Aggregate Team
+      if (data.teamId) {
+        if (!teamAgg[data.teamId]) {
+          teamAgg[data.teamId] = {
+            id: data.teamId,
+            name: data.teamName || '',
+            crest: data.teamCrest || '',
+            totalRants: 0
+          };
+        }
+        teamAgg[data.teamId].totalRants += data.totalRants || 0;
+      }
+    }
+  }
+
+  // 3. Aggregate user rants
+  for (const matchId of validMatchIds) {
+    let userRants = {};
+    if (hasRedis && redisClient) {
+      try {
+        const raw = await redisClient.hgetall(`user_rants:${matchId}`);
+        if (raw && Object.keys(raw).length > 0) {
+          for (const [userId, val] of Object.entries(raw)) {
+            userRants[userId] = JSON.parse(val);
+          }
+        } else {
+          // Fallback: reconstruct from recent_rants:${matchId}
+          const rawList = await redisClient.lrange(`recent_rants:${matchId}`, 0, -1);
+          const messages = rawList.map(val => JSON.parse(val));
+          for (const msg of messages) {
+            if (msg.userId) {
+              if (!userRants[msg.userId]) {
+                userRants[msg.userId] = {
+                  id: msg.userId,
+                  name: msg.userName || 'تماشاگر ناشناس',
+                  avatar: msg.userAvatar || '',
+                  totalRants: 0
+                };
+              }
+              userRants[msg.userId].totalRants += 1;
+            }
+          }
+        }
+      } catch (e) {
+        console.error(`Error reading user rants for ${matchId}:`, e);
+      }
+    } else {
+      if (globalThis.cachedDb.userMatchTotals && globalThis.cachedDb.userMatchTotals[matchId]) {
+        userRants = globalThis.cachedDb.userMatchTotals[matchId];
+      } else {
+        // Reconstruct from recentRants
+        const messages = globalThis.cachedDb.recentRants[matchId] || [];
+        for (const msg of messages) {
+          if (msg.userId) {
+            if (!userRants[msg.userId]) {
+              userRants[msg.userId] = {
+                id: msg.userId,
+                name: msg.userName || 'تماشاگر ناشناس',
+                avatar: msg.userAvatar || '',
+                totalRants: 0
+              };
+            }
+            userRants[msg.userId].totalRants += 1;
+          }
+        }
+      }
+    }
+
+    for (const [userId, data] of Object.entries(userRants)) {
+      if (!userId) continue;
+      if (!userAgg[userId]) {
+        userAgg[userId] = {
+          id: userId,
+          name: data.name || '',
+          avatar: data.avatar || '',
+          totalRants: 0
+        };
+      }
+      userAgg[userId].totalRants += data.totalRants || 0;
+    }
+  }
+
+  // Sort and limit to top 10
+  const topPlayers = Object.values(playerAgg)
+    .sort((a, b) => b.totalRants - a.totalRants)
+    .slice(0, 10);
+
+  const topTeams = Object.values(teamAgg)
+    .sort((a, b) => b.totalRants - a.totalRants)
+    .slice(0, 10);
+
+  const topUsers = Object.values(userAgg)
+    .sort((a, b) => b.totalRants - a.totalRants)
+    .slice(0, 10);
+
+  return { players: topPlayers, teams: topTeams, users: topUsers };
 }
 
 // 5. User profile and predictions (unchanged API, key-isolated)

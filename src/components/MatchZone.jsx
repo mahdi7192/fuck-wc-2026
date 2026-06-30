@@ -546,82 +546,97 @@ export default function MatchZone({ matchId, onBack, userProfile, userId }) {
     const teamScore = isHome ? matchScore.home : matchScore.away;
     const isLiveOrFinished = status === "LIVE" || status === "FINISHED";
 
+    const isGermanyMatch =
+      homeTeamName === "Germany" ||
+      homeTeamName === "آلمان" ||
+      awayTeamName === "Germany" ||
+      awayTeamName === "آلمان";
+
     // 1. Determine which bench players are subbed in
     const updatedBench = bench.map((p, idx) => {
       let subbedInMin = null;
       if (isLiveOrFinished) {
-        if (p.name.includes("Undav") || p.name.includes("دنیز اونداو")) {
-          subbedInMin = 72;
-        } else if (idx === 0) {
-          subbedInMin = 60;
-        } else if (idx === 1) {
-          subbedInMin = 75;
-        } else if (idx === 2) {
-          subbedInMin = 82;
+        if (isGermanyMatch) {
+          if (isHome) {
+            if (p.name.includes("Undav") || p.name.includes("دنیز اونداو")) {
+              subbedInMin = 72;
+            } else if (idx === 1) { // Leroy Sane
+              subbedInMin = 60;
+            } else if (idx === 2) { // Niclas Füllkrug
+              subbedInMin = 75;
+            } else if (idx === 3) { // Nico Schlotterbeck
+              subbedInMin = 82;
+            }
+          } else {
+            // Curaçao bench
+            if (idx === 0) { // Kenji Gorré
+              subbedInMin = 60;
+            } else if (idx === 1) { // Jafar Arias
+              subbedInMin = 75;
+            } else if (idx === 2) { // Gervane Kastaneer
+              subbedInMin = 82;
+            }
+          }
+        } else {
+          // Real Match: use real API values
+          if (p.subbedIn === true) {
+            subbedInMin = p.subbedInMin || 70;
+          }
         }
       }
 
-      if (subbedInMin && matchMinutes >= subbedInMin) {
-        return {
-          ...p,
-          subbedIn: subbedInMin,
-          subbedOut: null,
-          minutesPlayed: Math.max(0, matchMinutes - subbedInMin),
-          baseRating: 6.5,
-          goals: 0,
-          assists: 0,
-          shots: 0,
-          yellowCards: 0,
-          redCards: 0,
-        };
-      } else {
-        return {
-          ...p,
-          subbedIn: null,
-          subbedOut: null,
-          minutesPlayed: 0,
-          baseRating: null,
-          goals: 0,
-          assists: 0,
-          shots: 0,
-          yellowCards: 0,
-          redCards: 0,
-        };
-      }
+      const isSubbed = subbedInMin !== null && matchMinutes >= subbedInMin;
+
+      return {
+        ...p,
+        starter: false,
+        subbedIn: isSubbed ? subbedInMin : null,
+        subbedOut: null,
+        minutesPlayed: isSubbed ? Math.max(0, matchMinutes - subbedInMin) : 0,
+        baseRating: isSubbed ? 6.5 : null,
+        goals: p.goals || 0,
+        assists: p.assists || 0,
+        shots: p.shots || 0,
+        yellowCards: p.yellowCards || 0,
+        redCards: p.redCards || 0,
+      };
     });
 
     // 2. Map starters and determine if they were subbed out
     const updatedStarters = starters.map((p, idx) => {
       let subbedOutMin = null;
       if (isLiveOrFinished) {
-        if (
-          idx === 8 &&
-          matchMinutes >= 60 &&
-          updatedBench.some((b) => b.subbedIn === 60)
-        ) {
-          subbedOutMin = 60;
-        } else if (
-          idx === 9 &&
-          matchMinutes >= 72 &&
-          updatedBench.some((b) => b.subbedIn === 72)
-        ) {
-          subbedOutMin = 72;
-        } else if (
-          idx === 9 &&
-          matchMinutes >= 75 &&
-          updatedBench.some((b) => b.subbedIn === 75)
-        ) {
-          subbedOutMin = 75;
-        } else if (
-          idx === 10 &&
-          matchMinutes >= 82 &&
-          updatedBench.some((b) => b.subbedIn === 82)
-        ) {
-          subbedOutMin = 82;
+        if (isGermanyMatch) {
+          if (isHome) {
+            if (idx === 7 && matchMinutes >= 60) { // Felix Nmecha
+              subbedOutMin = 60;
+            } else if (idx === 8 && matchMinutes >= 72) { // Jamal Musiala
+              subbedOutMin = 72;
+            } else if (idx === 9 && matchMinutes >= 75) { // Kai Havertz
+              subbedOutMin = 75;
+            } else if (idx === 10 && matchMinutes >= 82) { // Florian Wirtz
+              subbedOutMin = 82;
+            }
+          } else {
+            // Curaçao starters
+            if (idx === 8 && matchMinutes >= 60) { // Brandley Kuwas
+              subbedOutMin = 60;
+            } else if (idx === 9 && matchMinutes >= 75) { // Jürgen Locadia
+              subbedOutMin = 75;
+            } else if (idx === 10 && matchMinutes >= 82) { // Rangelo Janga
+              subbedOutMin = 82;
+            }
+          }
+        } else {
+          // Real Match: use real API values
+          if (p.subbedOut === true) {
+            subbedOutMin = p.subbedOutMin || 70;
+          }
         }
       }
 
-      const minutesPlayed = subbedOutMin
+      const isSubbed = subbedOutMin !== null && matchMinutes >= subbedOutMin;
+      const minutesPlayed = isSubbed
         ? subbedOutMin
         : isLiveOrFinished
           ? matchMinutes
@@ -629,22 +644,20 @@ export default function MatchZone({ matchId, onBack, userProfile, userId }) {
 
       return {
         ...p,
+        starter: true,
         subbedIn: null,
-        subbedOut: subbedOutMin,
+        subbedOut: isSubbed ? subbedOutMin : null,
         minutesPlayed,
         baseRating: isLiveOrFinished ? 7.5 : null,
-        goals: 0,
-        assists: 0,
-        shots: 0,
-        yellowCards: 0,
-        redCards: 0,
+        goals: p.goals || 0,
+        assists: p.assists || 0,
+        shots: p.shots || 0,
+        yellowCards: p.yellowCards || 0,
+        redCards: p.redCards || 0,
       };
     });
 
     // 3. Distribute goals based on matchScore
-    const isGermanyMatch =
-      (homeTeamName === "Germany" && awayTeamName === "Curaçao") ||
-      (homeTeamName === "Curaçao" && awayTeamName === "Germany");
 
     const allPlayers = [...updatedStarters, ...updatedBench].filter(
       (p) => p.minutesPlayed > 0,
@@ -802,6 +815,46 @@ export default function MatchZone({ matchId, onBack, userProfile, userId }) {
     );
   };
 
+  const getDynamicRoster = (players, bench) => {
+    let currentMin = 0;
+    if (typeof matchMinutes === 'number') {
+      currentMin = matchMinutes;
+    } else if (typeof matchMinutes === 'string') {
+      if (/HT/i.test(matchMinutes) || matchMinutes === 'بین نیمه') {
+        currentMin = 45;
+      } else {
+        currentMin = parseInt(matchMinutes) || 0;
+      }
+    }
+
+    const activeOnPitch = [];
+    const onBench = [];
+
+    // Check starters
+    players.forEach((p) => {
+      const subbedOutMin = p.subbedOut;
+      if (subbedOutMin && currentMin >= subbedOutMin) {
+        onBench.push(p);
+      } else {
+        activeOnPitch.push(p);
+      }
+    });
+
+    // Check bench players
+    bench.forEach((p) => {
+      const subbedInMin = p.subbedIn;
+      if (subbedInMin && currentMin >= subbedInMin) {
+        activeOnPitch.push(p);
+      } else {
+        onBench.push(p);
+      }
+    });
+
+    return {
+      startersOnField: sortPlayers(activeOnPitch),
+      benchOffField: onBench,
+    };
+  };
   // Handle real API fetch automatically on mount or when token is set
   useEffect(() => {
     if (authToken && matchId) {
@@ -1430,8 +1483,8 @@ export default function MatchZone({ matchId, onBack, userProfile, userId }) {
     return jokes[king.id % jokes.length];
   };
 
-  const renderPlayerRow = (player) => {
-    const lastName = player.name.split(" ").slice(-1)[0] || player.name;
+  const renderPlayerRow = (player, isOnField = true) => {
+    const displayName = player.name;
     const isHome = player.side === "home";
     const posColor = getPositionColor(player.position);
     const hasMostRants = maxRants > 0 && player.totalRants === maxRants;
@@ -1444,8 +1497,7 @@ export default function MatchZone({ matchId, onBack, userProfile, userId }) {
         }}
         className={`native-player-row ${isHome ? "home-row" : "away-row"}`}
         style={{
-          opacity:
-            player.subbedIn === null && player.minutesPlayed === 0 ? 0.65 : 1,
+          opacity: isOnField ? 1 : 0.65,
           borderRight: isHome ? `3px solid ${posColor}` : undefined,
           borderLeft: !isHome ? `3px solid ${posColor}` : undefined,
           cursor: "pointer",
@@ -1491,7 +1543,7 @@ export default function MatchZone({ matchId, onBack, userProfile, userId }) {
               className="native-player-name"
               style={{ display: "flex", alignItems: "center", gap: "4px" }}
             >
-              {lastName}
+              {displayName}
               {player.subbedOut && (
                 <span
                   style={{
@@ -1571,7 +1623,7 @@ export default function MatchZone({ matchId, onBack, userProfile, userId }) {
       <div className="native-roster-list">
         <h3 className="native-section-title">ترکیب اصلی</h3>
         <div className="native-players-group">
-          {starters.map(renderPlayerRow)}
+          {starters.map((p) => renderPlayerRow(p, true))}
         </div>
 
         {bench.length > 0 && (
@@ -1580,7 +1632,7 @@ export default function MatchZone({ matchId, onBack, userProfile, userId }) {
               بازیکنان ذخیره
             </h3>
             <div className="native-players-group">
-              {bench.map(renderPlayerRow)}
+              {bench.map((p) => renderPlayerRow(p, false))}
             </div>
           </>
         )}
@@ -1720,12 +1772,18 @@ export default function MatchZone({ matchId, onBack, userProfile, userId }) {
               <div className="native-roster-columns" style={{ flex: 1, overflowY: 'auto', WebkitOverflowScrolling: 'touch', paddingBottom: 'calc(64px + env(safe-area-inset-bottom))' }}>
                 {/* Right Column: Home Team */}
                 <div className="native-roster-column">
-                  {renderTeamRoster(homePlayers, homeBench)}
+                  {(() => {
+                    const dynamicRoster = getDynamicRoster(homePlayers, homeBench);
+                    return renderTeamRoster(dynamicRoster.startersOnField, dynamicRoster.benchOffField);
+                  })()}
                 </div>
 
                 {/* Left Column: Away Team */}
                 <div className="native-roster-column">
-                  {renderTeamRoster(awayPlayers, awayBench)}
+                  {(() => {
+                    const dynamicRoster = getDynamicRoster(awayPlayers, awayBench);
+                    return renderTeamRoster(dynamicRoster.startersOnField, dynamicRoster.benchOffField);
+                  })()}
                 </div>
               </div>
             )
