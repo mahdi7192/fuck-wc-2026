@@ -88,7 +88,7 @@ export default function RantDialog({
       onClick={handleDialogClick}
       onCancel={handleCancel}
     >
-      <div className="sheet-container" style={{ gap: '14px', padding: '8px 16px 20px 16px', maxHeight: '90vh', overflowY: 'hidden', display: 'flex', flexDirection: 'column' }}>
+      <div className="sheet-container" style={{ gap: '14px', padding: '8px 16px 20px 16px', maxHeight: '90vh', overflowY: 'auto', WebkitOverflowScrolling: 'touch', display: 'flex', flexDirection: 'column' }}>
         {/* Drag handle */}
         <div className="sheet-drag-handle"></div>
 
@@ -205,12 +205,12 @@ export default function RantDialog({
         )}
 
         {/* Section 2: Curses Analytics (Top 10) at the Bottom */}
-        <div className="native-dialog-section" style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', paddingBottom: '10px' }}>
+        <div className="native-dialog-section" style={{ paddingBottom: '10px' }}>
           <h3 className="native-dialog-section-title" style={{ marginBottom: '6px' }}>
             آمار هوهای ثبت‌شده ({totalRants} بار)
           </h3>
           
-          <div className="native-analytics-list" style={{ display: 'flex', flexDirection: 'column', gap: '8px', flex: 1, overflowY: 'auto', paddingRight: '4px' }}>
+          <div className="native-analytics-list" style={{ display: 'flex', flexDirection: 'column', gap: '8px', paddingRight: '4px' }}>
             {sortedRantsForAnalytics.map((rant) => {
               const count = rant.count;
               const percent = totalRants > 0 ? Math.round((count / totalRants) * 100) : 0;
