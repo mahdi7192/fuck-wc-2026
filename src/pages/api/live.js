@@ -1,5 +1,5 @@
 export const prerender = false;
-import { getDb } from '../../utils/db.js';
+import { getMatchRants, getRecentRants } from '../../utils/db.js';
 
 export async function GET({ request }) {
   const url = new URL(request.url);
@@ -16,12 +16,8 @@ export async function GET({ request }) {
   }
 
   try {
-    const db = await getDb();
-    const rantsForMatch = db.rants?.[matchId] || {};
-    const recentRants = db.recentRants?.[matchId] || [];
-    
-    // Filter recent rants that happened after the 'since' timestamp
-    const newRants = recentRants.filter(r => r.timestamp > since);
+    const rantsForMatch = await getMatchRants(matchId);
+    const newRants = await getRecentRants(matchId, since);
 
     return new Response(JSON.stringify({
       rants: rantsForMatch,

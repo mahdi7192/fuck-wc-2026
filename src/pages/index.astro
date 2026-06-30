@@ -37,7 +37,10 @@ import AppShell from '../components/AppShell.jsx';
 					// Inform Telegram the app is ready
 					webapp.ready();
 
-					// Telegram ready hook
+					// Disable vertical swipe-to-close gesture to prevent scroll freezing
+					if (typeof webapp.disableVerticalSwipes === 'function') {
+						webapp.disableVerticalSwipes();
+					}
 				}
 			});
 		</script>

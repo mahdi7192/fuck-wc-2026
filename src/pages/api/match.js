@@ -1,5 +1,5 @@
 export const prerender = false;
-import { getDb, addRant } from '../../utils/db.js';
+import { getMatchRants, addRant } from '../../utils/db.js';
 
 // Initialize global variables to store cache in RAM
 globalThis.matchCache = globalThis.matchCache || { matches: null, details: {} };
@@ -150,7 +150,6 @@ export async function GET({ request }) {
   const matchId = request.headers.get('x-match-id') || url.searchParams.get('matchId') || url.searchParams.get('match_id');
   const now = Date.now();
   const cache = getCache();
-  const db = await getDb();
 
   const simulateToggle = (typeof import.meta !== 'undefined' && import.meta.env?.PUBLIC_SIMULATE_MATCH === 'true') ||
                          (typeof process !== 'undefined' && process.env?.PUBLIC_SIMULATE_MATCH === 'true');
@@ -163,10 +162,10 @@ export async function GET({ request }) {
   // Case 1: Fetch detailed match by ID (MatchZone)
   if (matchId) {
     const cachedDetail = cache.details[matchId];
+    const rantsForMatch = await getMatchRants(matchId);
     
     // Helper to merge latest rants from file store into player list
     const mergeRantsForMatch = (matchData) => {
-      const rantsForMatch = db.rants?.[matchId] || {};
       const mergeRants = (player) => {
         const rantsData = rantsForMatch[player.id] || { totalRants: 0, rants: {} };
         return {

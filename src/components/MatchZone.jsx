@@ -774,19 +774,106 @@ export default function MatchZone({ matchId, onBack, userProfile, userId }) {
     }
   }, [authToken, matchId]);
 
-  // Live polling sync for real-time player rants updates
+  // Real-time synchronization (SSE with Fallback Polling)
   useEffect(() => {
-    if (!matchId || matchStatus !== "LIVE") return;
+    if (!matchId) return;
 
     let lastTimestamp = 0;
     let isMounted = true;
+    let eventSource = null;
+    let pollingInterval = null;
+    let isSseActive = false;
 
-    console.log(`[Client] Starting live updates polling for match: ${matchId}`);
+    console.log(`[Client] Initializing real-time sync for match: ${matchId}`);
 
-    const pollLiveUpdates = async () => {
-      if (matchStatus !== "LIVE") return;
-      if (typeof document !== "undefined" && document.visibilityState === "hidden") return;
+    // Helper to process new rants (shared between SSE and Polling)
+    const handleNewRants = (newRants, rantsStatsMap) => {
+      if (!isMounted || !newRants || newRants.length === 0) return;
 
+      // Check for spikes (10+ rants for a player in the new batch)
+      const counts = {};
+      newRants.forEach(r => {
+        if (r.playerId) {
+          counts[r.playerId] = (counts[r.playerId] || 0) + 1;
+        }
+      });
+      const hasSpike = Object.values(counts).some(c => c >= 10);
+      if (hasSpike && lastTimestamp > 0) {
+        triggerEmojiRain();
+      }
+
+      // Update rant history feed
+      setRantHistory(prev => {
+        const existingIds = new Set(prev.map(r => r.id));
+        const filteredNew = newRants.filter(r => !existingIds.has(r.id));
+        if (filteredNew.length === 0) return prev;
+        const combined = [...prev, ...filteredNew];
+        return combined.sort((a, b) => a.timestamp - b.timestamp).slice(-100);
+      });
+
+      // Roster player rants updates
+      const playersToClear = new Set();
+      newRants.forEach((newRant) => {
+        const { playerId, rantKey } = newRant;
+        if (!playerId) return; // skip if general chat message
+
+        const playerStats = rantsStatsMap?.[playerId];
+        if (!playerStats) return;
+
+        const totalRants = playerStats.totalRants || 0;
+        const rants = playerStats.rants || {};
+        const rantPersian = PREDEFINED_RANTS.find((r) => r.key === rantKey)?.persianText || "";
+
+        const updateRants = (prevList) => {
+          return prevList.map((p) => {
+            if (p.id === playerId) {
+              const updated = {
+                ...p,
+                totalRants,
+                rants,
+                activeRant: rantPersian,
+              };
+              if (p.baseRating) {
+                updated.rating = Math.max(
+                  1.0,
+                  parseFloat((p.baseRating - totalRants * 0.2).toFixed(1)),
+                );
+              }
+              return updated;
+            }
+            return p;
+          });
+        };
+
+        setHomePlayers(updateRants);
+        setAwayPlayers(updateRants);
+        setHomeBench(updateRants);
+        setAwayBench(updateRants);
+        playersToClear.add(playerId);
+      });
+
+      // Clear temporary active rants after 2 seconds
+      if (playersToClear.size > 0) {
+        setTimeout(() => {
+          if (!isMounted) return;
+          const clearRant = (prevList) => {
+            return prevList.map((p) => {
+              if (playersToClear.has(p.id)) {
+                return { ...p, activeRant: null };
+              }
+              return p;
+            });
+          };
+          setHomePlayers(clearRant);
+          setAwayPlayers(clearRant);
+          setHomeBench(clearRant);
+          setAwayBench(clearRant);
+        }, 2000);
+      }
+    };
+
+    // Polling function (fallback/initial fetch)
+    const pollLiveUpdates = async (forceFetchHistory = false) => {
       try {
         const res = await fetch(`/api/live?matchId=${matchId}&since=${lastTimestamp}`);
         if (!res.ok) throw new Error(`Status ${res.status}`);
@@ -794,105 +881,81 @@ export default function MatchZone({ matchId, onBack, userProfile, userId }) {
         if (!isMounted) return;
 
         if (data.newRants && data.newRants.length > 0) {
-          // Check for spikes (10+ rants for a player in the new batch)
-          const counts = {};
-          data.newRants.forEach(r => {
-            counts[r.playerId] = (counts[r.playerId] || 0) + 1;
-          });
-          const hasSpike = Object.values(counts).some(c => c >= 10);
-          if (hasSpike && lastTimestamp > 0) {
-            triggerEmojiRain();
-          }
-
-          // Update rant history feed
-          setRantHistory(prev => {
-            const existingIds = new Set(prev.map(r => r.id));
-            const filteredNew = data.newRants.filter(r => !existingIds.has(r.id));
-            const combined = [...prev, ...filteredNew];
-            return combined.slice(-100);
-          });
-
-          // Keep a set of processed player IDs to clear their activeRants after 2 seconds
-          const playersToClear = new Set();
-
-          data.newRants.forEach((newRant) => {
-            const { playerId, rantKey } = newRant;
-            const playerStats = data.rants?.[playerId];
-            if (!playerStats) return;
-
-            const totalRants = playerStats.totalRants || 0;
-            const rants = playerStats.rants || {};
-
-            // Resolve Persian text of the rant
-            const rantPersian =
-              PREDEFINED_RANTS.find((r) => r.key === rantKey)?.persianText || "";
-
-            const updateRants = (prevList) => {
-              return prevList.map((p) => {
-                if (p.id === playerId) {
-                  const updated = {
-                    ...p,
-                    totalRants,
-                    rants,
-                    activeRant: rantPersian,
-                  };
-                  if (p.baseRating) {
-                    updated.rating = Math.max(
-                      1.0,
-                      parseFloat((p.baseRating - totalRants * 0.2).toFixed(1)),
-                    );
-                  }
-                  return updated;
-                }
-                return p;
-              });
-            };
-
-            setHomePlayers(updateRants);
-            setAwayPlayers(updateRants);
-            setHomeBench(updateRants);
-            setAwayBench(updateRants);
-
-            playersToClear.add(playerId);
-          });
-
-          // After 2 seconds, clear the activeRants for the players that had updates
-          setTimeout(() => {
-            if (!isMounted) return;
-            const clearRant = (prevList) => {
-              return prevList.map((p) => {
-                if (playersToClear.has(p.id)) {
-                  return { ...p, activeRant: null };
-                }
-                return p;
-              });
-            };
-            setHomePlayers(clearRant);
-            setAwayPlayers(clearRant);
-            setHomeBench(clearRant);
-            setAwayBench(clearRant);
-          }, 2000);
+          handleNewRants(data.newRants, data.rants);
         }
 
         if (data.timestamp) {
           lastTimestamp = data.timestamp;
         }
       } catch (err) {
-        console.error("[Client] Failed to poll live updates:", err);
+        console.error("[Client] Polling failed:", err);
       }
     };
 
-    // Poll every 10 seconds
-    const interval = setInterval(pollLiveUpdates, 10000);
+    // Initialize Polling Fallback
+    const startPollingFallback = () => {
+      if (pollingInterval) return;
+      console.log("[Client] Starting fallback polling loop (5s)");
+      pollingInterval = setInterval(() => pollLiveUpdates(false), 5000);
+    };
 
-    // Initial fetch to establish lastTimestamp
-    pollLiveUpdates();
+    const stopPollingFallback = () => {
+      if (pollingInterval) {
+        clearInterval(pollingInterval);
+        pollingInterval = null;
+      }
+    };
+
+    // Fetch initial history
+    pollLiveUpdates(true).then(() => {
+      if (!isMounted) return;
+
+      // Initialize SSE if browser supports it
+      if (typeof window !== 'undefined' && 'EventSource' in window) {
+        try {
+          console.log("[Client] Connecting to SSE stream...");
+          eventSource = new EventSource(`/api/live-stream?matchId=${matchId}`);
+          
+          eventSource.onopen = () => {
+            console.log("[Client] SSE stream connection established!");
+            isSseActive = true;
+            stopPollingFallback(); // Disable polling while SSE is healthy
+          };
+
+          eventSource.onmessage = async (event) => {
+            if (event.data === ": heartbeat") return;
+            try {
+              // Trigger poll to pull latest verified logs and rating scores
+              await pollLiveUpdates(false);
+            } catch (err) {
+              console.error("[Client] Failed to process SSE event message:", err);
+            }
+          };
+
+          eventSource.onerror = (err) => {
+            console.warn("[Client] SSE stream disconnected or errored. Activating polling fallback.", err);
+            isSseActive = false;
+            startPollingFallback();
+          };
+
+        } catch (e) {
+          console.error("[Client] Failed to initialize SSE client:", e);
+          startPollingFallback();
+        }
+      } else {
+        console.warn("[Client] EventSource not supported by browser. Using polling.");
+        startPollingFallback();
+      }
+    });
 
     return () => {
       isMounted = false;
-      clearInterval(interval);
+      stopPollingFallback();
+      if (eventSource) {
+        eventSource.close();
+      }
     };
-  }, [matchId, matchStatus]);
+  }, [matchId]);
 
   // Update match minutes locally every minute when live
   useEffect(() => {
@@ -1208,6 +1271,20 @@ export default function MatchZone({ matchId, onBack, userProfile, userId }) {
       }),
     );
 
+    // Optimistically add the rant to the chat history feed immediately
+    const tempId = `temp_rant_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    const tempMessage = {
+      id: tempId,
+      playerId,
+      playerName: player.name,
+      rantKey,
+      userId,
+      userName: userProfile?.name || 'تماشاگر ناشناس',
+      userAvatar: userProfile?.avatar || '',
+      timestamp: Date.now()
+    };
+    setRantHistory(prev => [...prev, tempMessage]);
+
     // Clear temporary active rant after 2 seconds
     setTimeout(() => {
       setList((prev) =>
@@ -1477,7 +1554,7 @@ export default function MatchZone({ matchId, onBack, userProfile, userId }) {
   }
 
   return (
-    <div className="match-zone-container">
+    <div className="match-zone-container" style={{ display: 'flex', flexDirection: 'column', height: '100%', width: '100%', overflow: 'hidden' }}>
       {/* Falling Emoji Rain */}
       {rainElements.map(emoji => (
         <span 
@@ -1565,85 +1642,87 @@ export default function MatchZone({ matchId, onBack, userProfile, userId }) {
           </div>
         </div>
 
-        {/* Conditional Tab Rendering */}
-        {matchTab === 'lineup' ? (
-          !isLineupReady() ? (
-            <div className="lineup-not-ready-container" style={{ padding: '40px 16px', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '16px', background: 'var(--color-bg)', minHeight: '300px' }}>
-              <span style={{ fontSize: '3rem' }}>⏳</span>
-              <h3 style={{ fontSize: '1.25rem', fontWeight: '800', color: 'var(--text-primary)' }}>هنوز لیست رسمی اعلام نشده است</h3>
-              <p style={{ fontSize: '0.95rem', color: 'var(--text-secondary)', maxWidth: '280px', lineHeight: '1.6' }}>
-                بنجلا منتظرن ببینن کی میره تو زمین! 🏟️
-                <br />
-                (معمولاً ۱ ساعت قبل از شروع بازی ترکیب نهایی اعلام میشه)
-              </p>
-            </div>
-          ) : (
-            <div className="native-roster-columns" style={{ paddingBottom: '74px' }}>
-              {/* Right Column: Home Team */}
-              <div className="native-roster-column">
-                {renderTeamRoster(homePlayers, homeBench)}
+        {/* Tab Content Wrapper */}
+        <div className="match-zone-tab-content" style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden', position: 'relative' }}>
+          {matchTab === 'lineup' ? (
+            !isLineupReady() ? (
+              <div className="lineup-not-ready-container" style={{ padding: '40px 16px', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '16px', background: 'var(--color-bg)', minHeight: '300px' }}>
+                <span style={{ fontSize: '3rem' }}>⏳</span>
+                <h3 style={{ fontSize: '1.25rem', fontWeight: '800', color: 'var(--text-primary)' }}>هنوز لیست رسمی اعلام نشده است</h3>
+                <p style={{ fontSize: '0.95rem', color: 'var(--text-secondary)', maxWidth: '280px', lineHeight: '1.6' }}>
+                  بنجلا منتظرن ببینن کی میره تو زمین! 🏟️
+                  <br />
+                  (معمولاً ۱ ساعت قبل از شروع بازی ترکیب نهایی اعلام میشه)
+                </p>
               </div>
+            ) : (
+              <div className="native-roster-columns" style={{ flex: 1, overflowY: 'auto', WebkitOverflowScrolling: 'touch', paddingBottom: 'calc(64px + env(safe-area-inset-bottom))' }}>
+                {/* Right Column: Home Team */}
+                <div className="native-roster-column">
+                  {renderTeamRoster(homePlayers, homeBench)}
+                </div>
 
-              {/* Left Column: Away Team */}
-              <div className="native-roster-column">
-                {renderTeamRoster(awayPlayers, awayBench)}
+                {/* Left Column: Away Team */}
+                <div className="native-roster-column">
+                  {renderTeamRoster(awayPlayers, awayBench)}
+                </div>
               </div>
-            </div>
-          )
-        ) : (
-          <div ref={chatContainerRef} className="rant-history-feed-container" style={{ paddingBottom: '130px' }}>
-            {rantHistory.length > 0 ? (
-              <div className="rant-history-list">
-                {rantHistory.map((rant) => {
-                  const defaultEmojis = ['⚽', '🏆', '💩', '🤡', '👑', '🏃‍♂️', '🧤', '🍔', '🍺', '🦖'];
-                  const isEmoji = rant.userAvatar && defaultEmojis.includes(rant.userAvatar);
-                  const rantText = PREDEFINED_RANTS.find(r => r.key === rant.rantKey)?.persianText || rant.rantKey;
-                  const isMyMessage = rant.userId === userId;
-                  
-                  return (
-                    <div key={rant.id} className={`rant-feed-item ${isMyMessage ? 'my-message' : ''}`}>
-                      <div className="rant-feed-avatar-wrapper">
-                        {!rant.userAvatar ? (
-                          <div className="rant-feed-avatar initials">{rant.userName ? rant.userName.trim().charAt(0) : '👤'}</div>
-                        ) : isEmoji ? (
-                          <div className="rant-feed-avatar emoji">{rant.userAvatar}</div>
-                        ) : (
-                          <img src={rant.userAvatar} alt="User" className="rant-feed-avatar" onError={(e) => {
-                            e.target.onerror = null;
-                            e.target.src = 'https://api.dicebear.com/7.x/avataaars/svg?seed=placeholder';
-                          }} />
-                        )}
-                      </div>
-                      <div className="rant-feed-content">
-                        <div className="rant-feed-meta">
-                          <span className="rant-feed-username">{rant.userName}</span>
-                          <span className="rant-feed-time">{new Date(rant.timestamp).toLocaleTimeString('fa-IR', { hour: '2-digit', minute: '2-digit' })}</span>
+            )
+          ) : (
+            <div ref={chatContainerRef} className="rant-history-feed-container" style={{ flex: 1, overflowY: 'auto', WebkitOverflowScrolling: 'touch', paddingBottom: 'calc(118px + env(safe-area-inset-bottom))' }}>
+              {rantHistory.length > 0 ? (
+                <div className="rant-history-list">
+                  {rantHistory.map((rant) => {
+                    const defaultEmojis = ['⚽', '🏆', '💩', '🤡', '👑', '🏃‍♂️', '🧤', '🍔', '🍺', '🦖'];
+                    const isEmoji = rant.userAvatar && defaultEmojis.includes(rant.userAvatar);
+                    const rantText = PREDEFINED_RANTS.find(r => r.key === rant.rantKey)?.persianText || rant.rantKey;
+                    const isMyMessage = rant.userId === userId;
+                    
+                    return (
+                      <div key={rant.id} className={`rant-feed-item ${isMyMessage ? 'my-message' : ''}`}>
+                        <div className="rant-feed-avatar-wrapper">
+                          {!rant.userAvatar ? (
+                            <div className="rant-feed-avatar initials">{rant.userName ? rant.userName.trim().charAt(0) : '👤'}</div>
+                          ) : isEmoji ? (
+                            <div className="rant-feed-avatar emoji">{rant.userAvatar}</div>
+                          ) : (
+                            <img src={rant.userAvatar} alt="User" className="rant-feed-avatar" onError={(e) => {
+                              e.target.onerror = null;
+                              e.target.src = 'https://api.dicebear.com/7.x/avataaars/svg?seed=placeholder';
+                            }} />
+                          )}
                         </div>
-                        <div className="rant-feed-bubble">
-                          <div className="rant-feed-body">
-                            {rant.playerName ? (
-                              <>
-                                به <strong style={{ color: 'var(--color-danger)' }}>{rant.playerName}</strong> غر زد: «<span className="rant-feed-text">{rantText}</span>»
-                              </>
-                            ) : (
-                              <span className="rant-feed-text">{rantText}</span>
-                            )}
+                        <div className="rant-feed-content">
+                          <div className="rant-feed-meta">
+                            <span className="rant-feed-username">{rant.userName}</span>
+                            <span className="rant-feed-time">{new Date(rant.timestamp).toLocaleTimeString('fa-IR', { hour: '2-digit', minute: '2-digit' })}</span>
+                          </div>
+                          <div className="rant-feed-bubble">
+                            <div className="rant-feed-body">
+                              {rant.playerName ? (
+                                <>
+                                  به <strong style={{ color: 'var(--color-danger)' }}>{rant.playerName}</strong> غر زد: «<span className="rant-feed-text">{rantText}</span>»
+                                </>
+                              ) : (
+                                <span className="rant-feed-text">{rantText}</span>
+                              )}
+                            </div>
                           </div>
                         </div>
                       </div>
-                    </div>
-                  );
-                })}
-              </div>
-            ) : (
-              <div className="rant-history-empty">
-                <span>💬</span>
-                <p>هنوز هیچ پیامی برای این بازی ثبت نشده است.</p>
-                {matchStatus === "LIVE" && <p className="blink-soft">اولین نفر باشید که پیام ارسال می‌کند!</p>}
-              </div>
-            )}
-          </div>
-        )}
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="rant-history-empty">
+                  <span>💬</span>
+                  <p>هنوز هیچ پیامی برای این بازی ثبت نشده است.</p>
+                  {matchStatus === "LIVE" && <p className="blink-soft">اولین نفر باشید که پیام ارسال می‌کند!</p>}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
 
         {/* Chat input bar rendered when Chat is active */}
         {matchTab === 'history' && (

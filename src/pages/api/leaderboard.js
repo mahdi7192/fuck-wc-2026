@@ -1,29 +1,11 @@
 export const prerender = false;
-import { getDb } from '../../utils/db';
+import { getLeaderboard } from '../../utils/db';
 
 export async function GET() {
   try {
-    const db = await getDb();
-    
-    // Convert players totals object to sorted array of top 10
-    const topPlayers = Object.entries(db.totals.players || {})
-      .map(([id, data]) => ({ id, ...data }))
-      .sort((a, b) => b.totalRants - a.totalRants)
-      .slice(0, 10);
+    const { players, teams, users } = await getLeaderboard();
 
-    // Convert teams totals object to sorted array of top 10
-    const topTeams = Object.entries(db.totals.teams || {})
-      .map(([id, data]) => ({ id, ...data }))
-      .sort((a, b) => b.totalRants - a.totalRants)
-      .slice(0, 10);
-
-    // Convert user totals object to sorted array of top 10
-    const topUsers = Object.entries(db.userTotals || {})
-      .map(([id, data]) => ({ id, ...data }))
-      .sort((a, b) => b.totalRants - a.totalRants)
-      .slice(0, 10);
-
-    return new Response(JSON.stringify({ players: topPlayers, teams: topTeams, users: topUsers }), {
+    return new Response(JSON.stringify({ players, teams, users }), {
       status: 200,
       headers: {
         'Content-Type': 'application/json'

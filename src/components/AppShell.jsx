@@ -293,16 +293,16 @@ export default function AppShell() {
   }
 
   return (
-    <div className="app-shell-content" style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', width: '100%' }}>
+    <div className="app-shell-content" style={{ display: 'flex', flexDirection: 'column', height: '100%', width: '100%', overflow: 'hidden' }}>
       {/* Sticky Navigation Bar */}
       <header className="native-app-bar">
         <div className="native-app-bar-inner">
           <div className="native-app-bar-right">
             {activeMatchId ? (
               <button
-                onClick={handleBack}
-                aria-label="بازگشت"
-                className="native-back-button"
+                 onClick={handleBack}
+                 aria-label="بازگشت"
+                 className="native-back-button"
               >
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M9 18l6-6-6-6" />
@@ -337,7 +337,15 @@ export default function AppShell() {
       </header>
 
       {/* Main Content Area */}
-      <main className="native-main-content" style={{ display: 'flex', flexDirection: 'column', flex: 1, width: '100%', paddingBottom: !activeMatchId ? '80px' : '0' }}>
+      <main className="native-main-content" style={{ 
+        display: 'flex', 
+        flexDirection: 'column', 
+        flex: 1, 
+        width: '100%', 
+        overflowY: activeMatchId ? 'hidden' : 'auto', 
+        WebkitOverflowScrolling: 'touch',
+        paddingBottom: !activeMatchId ? '80px' : '0' 
+      }}>
         {activeMatchId ? (
           <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', flex: 1, width: '100%' }}>
             <MatchZone matchId={activeMatchId} onBack={handleBack} userProfile={userProfile} userId={userId} />
