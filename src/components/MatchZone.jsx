@@ -83,48 +83,63 @@ const fetchPlayerPhoto = async (playerName) => {
   }
 };
 
-// Predefined list of Persian football rants with position tags
+// Predefined list of Persian football rants with position and category tags
 const PREDEFINED_RANTS = [
-  // General Rants
-  { key: "wild", persianText: "مرتیکه وحشی! 😠", positions: ["GOALKEEPER", "DEFENDER", "MIDFIELDER", "FORWARD"] },
-  { key: "clumsy", persianText: "این پاش به اون پاش میگه زکی! 🦶", positions: ["DEFENDER", "MIDFIELDER", "FORWARD"] },
-  { key: "sleep", persianText: "اصلا تو باغ نیست! 🌳", positions: ["GOALKEEPER", "DEFENDER", "MIDFIELDER", "FORWARD"] },
-  { key: "lazy", persianText: "داره قدم میزنه! 🚶", positions: ["DEFENDER", "MIDFIELDER", "FORWARD"] },
-  { key: "sub", persianText: "مربی تعویضش کن! 🔄", positions: ["GOALKEEPER", "DEFENDER", "MIDFIELDER", "FORWARD"] },
+  // Category: general (عمومی و رفتاری)
+  { key: "wild", persianText: "مرتیکه وحشی! 😠", positions: ["GOALKEEPER", "DEFENDER", "MIDFIELDER", "FORWARD"], category: "general" },
+  { key: "clumsy", persianText: "این پاش به اون پاش میگه زکی! 🦶", positions: ["DEFENDER", "MIDFIELDER", "FORWARD"], category: "general" },
+  { key: "clumsy2", persianText: "این پاش به اون پاش میگه تو برو من میام! 🚶‍♂️", positions: ["DEFENDER", "MIDFIELDER", "FORWARD"], category: "general" },
+  { key: "sleep", persianText: "اصلا تو باغ نیست! 🌳", positions: ["GOALKEEPER", "DEFENDER", "MIDFIELDER", "FORWARD"], category: "general" },
+  { key: "lazy", persianText: "داره قدم میزنه! 🚶", positions: ["DEFENDER", "MIDFIELDER", "FORWARD"], category: "general" },
+  { key: "sub", persianText: "مربی تعویضش کن! 🔄", positions: ["GOALKEEPER", "DEFENDER", "MIDFIELDER", "FORWARD"], category: "general" },
+  { key: "out_of_breath", persianText: "داره نفس‌نفس میزنه، بریده! 🥵", positions: ["DEFENDER", "MIDFIELDER", "FORWARD"], category: "general" },
+  { key: "tourist", persianText: "به عنوان توریست اومده توی زمین! 📸", positions: ["DEFENDER", "MIDFIELDER", "FORWARD"], category: "general" },
 
-  // Pass, Cross & Header (General outfield positions)
-  { key: "pass", persianText: "پاس بده دیگه! ⚽", positions: ["DEFENDER", "MIDFIELDER", "FORWARD"] },
-  { key: "bad_pass_angry", persianText: "این چه پاسیه آخه؟ 🤬", positions: ["DEFENDER", "MIDFIELDER", "FORWARD"] },
-  { key: "bad_cross", persianText: "سانت‌هات بخوره تو سرت! 🎯", positions: ["DEFENDER", "MIDFIELDER", "FORWARD"] },
-  { key: "bad_cross_bald", persianText: "ملت رو با این سانتات کچل کردی! 💇‍♂️", positions: ["DEFENDER", "MIDFIELDER", "FORWARD"] },
-  { key: "bad_head", persianText: "سر زدن هم بلد نیستی؟ 🗣️", positions: ["DEFENDER", "MIDFIELDER", "FORWARD"] },
-  { key: "bad_head_knee", persianText: "با سر زد یا با زانو؟ 🤦", positions: ["DEFENDER", "MIDFIELDER", "FORWARD"] },
+  // Category: technical (اشتباهات فنی: پاس، سانت، سر و شوت)
+  { key: "pass", persianText: "پاس بده دیگه! ⚽", positions: ["DEFENDER", "MIDFIELDER", "FORWARD"], category: "technical" },
+  { key: "bad_pass_angry", persianText: "این چه پاسیه آخه؟ 🤬", positions: ["DEFENDER", "MIDFIELDER", "FORWARD"], category: "technical" },
+  { key: "pass_to_opponent", persianText: "پاس میده به بازیکن حریف! 🤦‍♂️", positions: ["DEFENDER", "MIDFIELDER", "FORWARD"], category: "technical" },
+  { key: "bad_cross", persianText: "سانت‌هات بخوره تو سرت! 🎯", positions: ["DEFENDER", "MIDFIELDER", "FORWARD"], category: "technical" },
+  { key: "bad_cross_bald", persianText: "ملت رو با این سانتات کچل کردی! 💇‍♂️", positions: ["DEFENDER", "MIDFIELDER", "FORWARD"], category: "technical" },
+  { key: "bad_head", persianText: "سر زدن هم بلد نیستی؟ 🗣️", positions: ["DEFENDER", "MIDFIELDER", "FORWARD"], category: "technical" },
+  { key: "bad_head_knee", persianText: "با سر زد یا با زانو؟ 🤦", positions: ["DEFENDER", "MIDFIELDER", "FORWARD"], category: "technical" },
+  { key: "dribble", persianText: "مگه مجبوری دریبل بزنی؟ 👟", positions: ["MIDFIELDER", "FORWARD"], category: "technical" },
+  { key: "shoot", persianText: "چرا شوت نمیزنی؟ 😤", positions: ["FORWARD"], category: "technical" },
+  { key: "shoot_sky", persianText: "شوت زد یا هواپیما زد؟ ✈️", positions: ["MIDFIELDER", "FORWARD"], category: "technical" },
 
+  // Category: positional (اشتباهات تخصصی پست)
   // Goalkeeper Specific
-  { key: "gk_highway", persianText: "اتوبان باز کرده واسه حریف! 🛣️", positions: ["GOALKEEPER"] },
-  { key: "gk_easy_goal", persianText: "زاویه بسته رو چطور خوردی؟ 🥅", positions: ["GOALKEEPER"] },
-  { key: "gk_tunnel", persianText: "لایی خوردن تخصصشه! 🥚", positions: ["GOALKEEPER"] },
-  { key: "gk_dry_wood", persianText: "چرا مثل چوب خشک وایسادی؟ 🪵", positions: ["GOALKEEPER"] },
-  { key: "gk_hole_glove", persianText: "دستکشت سوراخه؟ 🧤", positions: ["GOALKEEPER"] },
+  { key: "gk_highway", persianText: "اتوبان باز کرده واسه حریف! 🛣️", positions: ["GOALKEEPER"], category: "positional" },
+  { key: "gk_easy_goal", persianText: "زاویه بسته رو چطور خوردی؟ 🥅", positions: ["GOALKEEPER"], category: "positional" },
+  { key: "gk_tunnel", persianText: "لایی خوردن تخصصشه! 🥚", positions: ["GOALKEEPER"], category: "positional" },
+  { key: "gk_dry_wood", persianText: "چرا مثل چوب خشک وایسادی؟ 🪵", positions: ["GOALKEEPER"], category: "positional" },
+  { key: "gk_hole_glove", persianText: "دستکشت سوراخه؟ 🧤", positions: ["GOALKEEPER"], category: "positional" },
+  { key: "gk_soap", persianText: "صابون مالیده به دستاش! 🧼", positions: ["GOALKEEPER"], category: "positional" },
+  { key: "gk_no_exit", persianText: "اصلا خروج بلد نیست! 🛫❌", positions: ["GOALKEEPER"], category: "positional" },
 
   // Defender Specific
-  { key: "defense", persianText: "دفاع سوراخ! 🕳️", positions: ["DEFENDER"] },
-  { key: "def_highway", persianText: "دفاع اتوبانی! 🚗", positions: ["DEFENDER"] },
-  { key: "def_left_behind", persianText: "جا موند مثل چی! 🏃‍♂️💨", positions: ["DEFENDER"] },
-  { key: "def_no_marking", persianText: "یارگیری بلد نیست! 👥", positions: ["DEFENDER"] },
+  { key: "defense", persianText: "دفاع سوراخ! 🕳️", positions: ["DEFENDER"], category: "positional" },
+  { key: "def_highway", persianText: "دفاع اتوبانی! 🚗", positions: ["DEFENDER"], category: "positional" },
+  { key: "def_left_behind", persianText: "جا موند مثل چی! 🏃‍♂️💨", positions: ["DEFENDER"], category: "positional" },
+  { key: "def_no_marking", persianText: "یارگیری بلد نیست! 👥", positions: ["DEFENDER"], category: "positional" },
+  { key: "def_offside_trap", persianText: "آفساید رو پر کرده اتوبان ساخته! 🚩", positions: ["DEFENDER"], category: "positional" },
+  { key: "def_slow_turn", persianText: "چرخشش مثل کامیون ۱۸ چرخ است! 🚚", positions: ["DEFENDER"], category: "positional" },
 
   // Midfielder Specific
-  { key: "mid_carrot", persianText: "هافبک نیست، هویجه! 🥕", positions: ["MIDFIELDER"] },
-  { key: "mid_highway", persianText: "وسط زمین اتوبان شده! 🛣️", positions: ["MIDFIELDER"] },
-  { key: "mid_no_creativity", persianText: "یک پاس خلاقانه نمیتونه بده! 🧠❌", positions: ["MIDFIELDER"] },
-  { key: "lose", persianText: "توپ لو دادن تخصصشه! 📉", positions: ["MIDFIELDER", "FORWARD"] },
+  { key: "mid_carrot", persianText: "هافبک نیست، هویجه! 🥕", positions: ["MIDFIELDER"], category: "positional" },
+  { key: "mid_highway", persianText: "وسط زمین اتوبان شده! 🛣️", positions: ["MIDFIELDER"], category: "positional" },
+  { key: "mid_no_creativity", persianText: "یک پاس خلاقانه نمیتونه بده! 🧠❌", positions: ["MIDFIELDER"], category: "positional" },
+  { key: "lose", persianText: "توپ لو دادن تخصصشه! 📉", positions: ["MIDFIELDER"], category: "positional" },
+  { key: "mid_snail", persianText: "وسط زمین مثل حلزون راه میره! 🐌", positions: ["MIDFIELDER"], category: "positional" },
+  { key: "mid_shadow", persianText: "فقط سایه بازیکن رو تعقیب میکنه! 👥", positions: ["MIDFIELDER"], category: "positional" },
 
   // Forward Specific
-  { key: "miss", persianText: "دروازه خالی رو گل نکرد! 🤦‍♂️", positions: ["FORWARD"] },
-  { key: "shoot", persianText: "چرا شوت نمیزنی؟ 😤", positions: ["FORWARD"] },
-  { key: "dribble", persianText: "مگه مجبوری دریبل بزنی؟ 👟", positions: ["FORWARD"] },
-  { key: "slow", persianText: "کند مثل حلزون! 🐌", positions: ["FORWARD"] },
-  { key: "fwd_offside", persianText: "آفساید‌نشین حرفه‌ای! 🚩", positions: ["FORWARD"] }
+  { key: "miss", persianText: "دروازه خالی رو گل نکرد! 🤦‍♂️", positions: ["FORWARD"], category: "positional" },
+  { key: "slow", persianText: "کند مثل حلزون! 🐌", positions: ["FORWARD"], category: "positional" },
+  { key: "fwd_offside", persianText: "آفساید‌نشین حرفه‌ای! 🚩", positions: ["FORWARD"], category: "positional" },
+  { key: "fwd_ball_heavy", persianText: "استپ بلد نیست، توپ سنگینه براش! 💣", positions: ["FORWARD"], category: "positional" },
+  { key: "fwd_scared", persianText: "انگار از توپ میترسه! 🫣", positions: ["FORWARD"], category: "positional" },
+  { key: "fwd_lost", persianText: "بین مدافعا گم شده! 🔎", positions: ["FORWARD"], category: "positional" }
 ];
 
 // Helper to generate a generic 11-player lineup if API squad details are unavailable

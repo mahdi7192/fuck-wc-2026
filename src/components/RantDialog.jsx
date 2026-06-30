@@ -72,6 +72,10 @@ export default function RantDialog({
     !rant.positions || rant.positions.includes(playerPosition)
   );
 
+  const generalRants = relevantRants.filter(r => r.category === 'general');
+  const technicalRants = relevantRants.filter(r => r.category === 'technical');
+  const positionalRants = relevantRants.filter(r => r.category === 'positional');
+
   const sortedRantsForAnalytics = [...predefinedRants]
     .map(rant => ({
       ...rant,
@@ -182,25 +186,105 @@ export default function RantDialog({
           </div>
         </div>
 
-        {/* Section 1: Booing Action Chips in 2 Columns at the Top (if Live) */}
+        {/* Section 1: Booing Action Chips in Categories (if Live) */}
         {matchStatus === 'LIVE' && (
-          <div className="native-dialog-section" style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: '14px', flexShrink: 0 }}>
-            <h3 className="native-dialog-section-title" style={{ marginBottom: '8px' }}>
+          <div className="native-dialog-section" style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: '14px', flexShrink: 0, display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <h3 className="native-dialog-section-title" style={{ marginBottom: '4px' }}>
               هو کردن بازیکن 📢
             </h3>
             
-            <div className="native-rants-vertical-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', padding: '4px 0' }}>
-              {relevantRants.map((rant) => (
-                <button
-                  key={rant.key}
-                  onClick={(e) => onRant(player.id, rant.key, e)}
-                  className="native-rant-chip"
-                  style={{ width: '100%', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', padding: '8px 6px', fontSize: '0.75rem', textAlign: 'center' }}
-                >
-                  {rant.persianText}
-                </button>
-              ))}
-            </div>
+            {/* General Rants */}
+            {generalRants.length > 0 && (
+              <div>
+                <h4 style={{ fontSize: '0.75rem', color: 'var(--text-hint)', marginBottom: '6px', fontWeight: '700' }}>عمومی و رفتاری</h4>
+                <div className="native-rants-vertical-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px' }}>
+                  {generalRants.map((rant) => (
+                    <button
+                      key={rant.key}
+                      onClick={(e) => onRant(player.id, rant.key, e)}
+                      className="native-rant-chip"
+                      style={{ 
+                        width: '100%', 
+                        minHeight: '34px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        whiteSpace: 'normal', 
+                        padding: '4px 6px', 
+                        fontSize: '0.68rem', 
+                        lineHeight: '1.2',
+                        textAlign: 'center',
+                        wordBreak: 'break-word'
+                      }}
+                    >
+                      {rant.persianText}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Technical Rants */}
+            {technicalRants.length > 0 && (
+              <div>
+                <h4 style={{ fontSize: '0.75rem', color: 'var(--text-hint)', marginBottom: '6px', fontWeight: '700' }}>اشتباهات فنی (پاس، سانت، سر، شوت)</h4>
+                <div className="native-rants-vertical-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px' }}>
+                  {technicalRants.map((rant) => (
+                    <button
+                      key={rant.key}
+                      onClick={(e) => onRant(player.id, rant.key, e)}
+                      className="native-rant-chip"
+                      style={{ 
+                        width: '100%', 
+                        minHeight: '34px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        whiteSpace: 'normal', 
+                        padding: '4px 6px', 
+                        fontSize: '0.68rem', 
+                        lineHeight: '1.2',
+                        textAlign: 'center',
+                        wordBreak: 'break-word'
+                      }}
+                    >
+                      {rant.persianText}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Positional Rants */}
+            {positionalRants.length > 0 && (
+              <div>
+                <h4 style={{ fontSize: '0.75rem', color: 'var(--text-hint)', marginBottom: '6px', fontWeight: '700' }}>اشتباهات تخصصی پست ({posLabel})</h4>
+                <div className="native-rants-vertical-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px' }}>
+                  {positionalRants.map((rant) => (
+                    <button
+                      key={rant.key}
+                      onClick={(e) => onRant(player.id, rant.key, e)}
+                      className="native-rant-chip"
+                      style={{ 
+                        width: '100%', 
+                        minHeight: '34px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        whiteSpace: 'normal', 
+                        padding: '4px 6px', 
+                        fontSize: '0.68rem', 
+                        lineHeight: '1.2',
+                        textAlign: 'center',
+                        wordBreak: 'break-word'
+                      }}
+                    >
+                      {rant.persianText}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         )}
 

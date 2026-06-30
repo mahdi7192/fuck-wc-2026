@@ -45,89 +45,122 @@ export default function AppShell() {
   // Cookie and WebApp initialization on mount
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      // 1. Telegram WebApp Check
-      const initData = window.Telegram?.WebApp?.initData;
       const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
       const urlParams = new URLSearchParams(window.location.search);
       const isMock = urlParams.get('mock') === 'true';
 
-      const inTelegram = !!initData;
-      const valid = inTelegram || isLocal || isMock;
-
-      setIsTelegramWebApp(valid);
-      setIsTelegramChecked(true);
-
-      if (!valid) return; // Stop if not in Telegram context
-
-      // 2. Resolve User ID
-      const tgUser = window.Telegram?.WebApp?.initDataUnsafe?.user;
-      let id = null;
-      if (tgUser && tgUser.id) {
-        id = `tg_${tgUser.id}`;
-        setCookie('rage_user_id', id, 365);
-      } else {
-        id = getCookie('rage_user_id');
-        if (!id) {
-          id = 'usr_' + Math.random().toString(36).substring(2, 15) + Date.now().toString(36);
-          setCookie('rage_user_id', id, 365);
-        }
-      }
-      setUserId(id);
-
-      // Save user details to cookies/localStorage for fast UI rendering
-      const cachedProfile = localStorage.getItem(`rage_profile_${id}`);
-      if (cachedProfile) {
-        try {
-          const parsed = JSON.parse(cachedProfile);
-          setUserProfileState(parsed);
-          setFormName(parsed.name || '');
-          if (parsed.avatar) {
-            if (defaultEmojis.includes(parsed.avatar)) {
-              setFormAvatar(parsed.avatar);
-              setAvatarType('emoji');
-            } else {
-              setCustomAvatarUrl(parsed.avatar);
-              setAvatarType('url');
-            }
-          }
-        } catch (e) {}
-      }
-
-      // Fetch latest profile from DB/Redis
-      fetch(`/api/user?userId=${id}`)
-        .then(res => res.json())
-        .then(data => {
-          if (data.profile) {
-            setUserProfileState(data.profile);
-            localStorage.setItem(`rage_profile_${id}`, JSON.stringify(data.profile));
-            setFormName(data.profile.name || '');
-            if (data.profile.avatar) {
-              if (defaultEmojis.includes(data.profile.avatar)) {
-                setFormAvatar(data.profile.avatar);
+      const loadUserProfile = (id) => {
+        // Save user details to cookies/localStorage for fast UI rendering
+        const cachedProfile = localStorage.getItem(`rage_profile_${id}`);
+        if (cachedProfile) {
+          try {
+            const parsed = JSON.parse(cachedProfile);
+            setUserProfileState(parsed);
+            setFormName(parsed.name || '');
+            if (parsed.avatar) {
+              if (defaultEmojis.includes(parsed.avatar)) {
+                setFormAvatar(parsed.avatar);
                 setAvatarType('emoji');
               } else {
-                setCustomAvatarUrl(data.profile.avatar);
+                setCustomAvatarUrl(parsed.avatar);
                 setAvatarType('url');
               }
             }
-          } else {
-            // Profile does not exist yet -> First time setup!
-            setIsFirstTimeSetup(true);
-            setShowProfileModal(true);
+          } catch (e) {}
+        }
 
-            // Try to prefill from Telegram WebApp SDK user object
-            if (window.Telegram?.WebApp?.initDataUnsafe?.user) {
-              const tgUser = window.Telegram.WebApp.initDataUnsafe.user;
-              const defaultName = tgUser.first_name + (tgUser.last_name ? ' ' + tgUser.last_name : '');
-              setFormName(defaultName || tgUser.username || '');
-              if (tgUser.photo_url) {
-                setCustomAvatarUrl(tgUser.photo_url);
-                setAvatarType('url');
+        // Fetch latest profile from DB/Redis
+        fetch(`/api/user?userId=${id}`)
+          .then(res => res.json())
+          .then(data => {
+            if (data.profile) {
+              setUserProfileState(data.profile);
+              localStorage.setItem(`rage_profile_${id}`, JSON.stringify(data.profile));
+              setFormName(data.profile.name || '');
+              if (data.profile.avatar) {
+                if (defaultEmojis.includes(data.profile.avatar)) {
+                  setFormAvatar(data.profile.avatar);
+                  setAvatarType('emoji');
+                } else {
+                  setCustomAvatarUrl(data.profile.avatar);
+                  setAvatarType('url');
+                }
               }
+            } else {
+              // Profile does not exist yet -> First time setup!
+              setIsFirstTimeSetup(true);
+              setShowProfileModal(true);
+
+              // Try to prefill from Telegram WebApp SDK user object
+              if (window.Telegram?.WebApp?.initDataUnsafe?.user) {
+                const tgUser = window.Telegram.WebApp.initDataUnsafe.user;
+                const defaultName = tgUser.first_name + (tgUser.last_name ? ' ' + tgUser.last_name : '');
+                setFormName(defaultName || tgUser.username || '');
+                if (tgUser.photo_url) {
+                  setCustomAvatarUrl(tgUser.photo_url);
+                  setAvatarType('url');
+                }
+              }
+            }
+          })
+          .catch(err => console.error("Failed to load user profile:", err));
+      };
+
+      const startUserSession = () => {
+        // Resolve User ID
+        const tgUser = window.Telegram?.WebApp?.initDataUnsafe?.user;
+        let id = null;
+        if (tgUser && tgUser.id) {
+          id = `tg_${tgUser.id}`;
+          setCookie('rage_user_id', id, 365);
+        } else {
+          id = getCookie('rage_user_id');
+          if (!id) {
+            id = 'usr_' + Math.random().toString(36).substring(2, 15) + Date.now().toString(36);
+            setCookie('rage_user_id', id, 365);
+          }
+        }
+        setUserId(id);
+        loadUserProfile(id);
+      };
+
+      let attempts = 0;
+      const maxAttempts = 30; // 3 seconds total duration with 100ms intervals
+
+      const checkAndInit = () => {
+        const hasTelegramScript = typeof window.Telegram !== 'undefined';
+        const initData = window.Telegram?.WebApp?.initData;
+        const inTelegram = !!initData;
+        const valid = inTelegram || isLocal || isMock;
+
+        if (valid) {
+          setIsTelegramWebApp(true);
+          setIsTelegramChecked(true);
+          startUserSession();
+          return true;
+        } else if (hasTelegramScript) {
+          // Script is loaded, but it's not local, mock, or within Telegram (empty initData)
+          setIsTelegramWebApp(false);
+          setIsTelegramChecked(true);
+          return true;
+        }
+        return false;
+      };
+
+      // Perform check immediately
+      if (!checkAndInit()) {
+        const intervalId = setInterval(() => {
+          attempts++;
+          if (checkAndInit() || attempts >= maxAttempts) {
+            clearInterval(intervalId);
+            if (attempts >= maxAttempts && typeof window.Telegram === 'undefined') {
+              // Timeout reached without script load. Assume not in Telegram context.
+              setIsTelegramWebApp(false);
+              setIsTelegramChecked(true);
             }
           }
-        })
-        .catch(err => console.error("Failed to load user profile:", err));
+        }, 100);
+      }
     }
   }, []);
 
